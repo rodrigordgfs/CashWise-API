@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { StatusCodes } from "http-status-codes";
 import categoryService from "../services/category.service.js";
+import AppError from "../utils/error.js";
 
 const handleErrorResponse = (error, reply) => {
   if (error instanceof z.ZodError) {
@@ -13,14 +14,14 @@ const handleErrorResponse = (error, reply) => {
     });
   }
 
-  const errorMessages = {
-    "Treino não encontrado": StatusCodes.NOT_FOUND,
-  };
-
   const statusCode =
-    errorMessages[error.message] || StatusCodes.INTERNAL_SERVER_ERROR;
-  reply.code(statusCode).send({
-    error: error.message || "Ocorreu um erro interno",
+    error instanceof AppError
+      ? StatusCodes.BAD_REQUEST
+      : StatusCodes.INTERNAL_SERVER_ERROR;
+
+  return reply.code(statusCode).send({
+    message: error.message || "Ocorreu um erro interno",
+    ...(error.details && { details: error.details }),
   });
 };
 
@@ -50,18 +51,15 @@ const createCategory = async (request, reply) => {
 
     const { userId, name, type, color, icon } = validation.data;
 
-    const category = await categoryService.createCategory({
+    const category = await categoryService.createCategory(
       userId,
       name,
       type,
       color,
-      icon,
-    });
+      icon
+    );
 
-    reply.code(StatusCodes.CREATED).send({
-      message: "Categoria criada com sucesso",
-      category,
-    });
+    reply.code(StatusCodes.CREATED).send(category);
   } catch (error) {
     handleErrorResponse(error, reply);
   }

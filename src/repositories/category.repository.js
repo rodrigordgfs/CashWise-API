@@ -1,19 +1,20 @@
 import prisma from "../libs/prisma.js";
+import AppError from "../utils/error.js";
 
 const logError = (error) => {
   console.error("Database Error:", error);
-  throw new Error("An unexpected error occurred. Please try again.");
+  throw new AppError("Erro ao criar categoria", error.message);
 };
 
-const createCategory = async ({ userId, name, type, color, icon }) => {
+const createCategory = async (userId, name, type, color, icon) => {
   try {
-    const category = await prisma.categories.create({
+    const category = await prisma.category.create({
       data: {
         userId,
-        name,
-        type,
         color,
         icon,
+        name,
+        type,
       },
     });
     return category;
@@ -23,5 +24,5 @@ const createCategory = async ({ userId, name, type, color, icon }) => {
 };
 
 export default {
-  createCategory
+  createCategory,
 };

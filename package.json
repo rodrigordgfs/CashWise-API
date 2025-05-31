@@ -9,6 +9,7 @@
     "start": "node src/server.js",
     "dev": "nodemon src/server.js",
     "prisma:generate": "prisma generate",
+    "prisma:studio": "prisma studio",
     "postinstall": "npm run prisma:generate",
     "seed": "npx prisma migrate reset --force && node prisma/seed.js",
     "new-route": "node newRoute.js",
