@@ -65,6 +65,125 @@ const createCategory = async (request, reply) => {
   }
 };
 
+const listCategories = async (request, reply) => {
+  const querySchema = z.object({
+    userId: z.string().optional(),
+    type: z.enum(["INCOME", "EXPENSE"]).optional(),
+  });
+
+  try {
+    const validation = querySchema.safeParse(request.query);
+
+    if (!validation.success) {
+      throw validation.error;
+    }
+
+    const { userId, type } = validation.data;
+
+    const categories = await categoryService.listCategories(userId, type);
+
+    reply.code(StatusCodes.OK).send(categories);
+  } catch (error) {
+    handleErrorResponse(error, reply);
+  }
+};
+
+const listCategoryById = async (request, reply) => {
+  const paramsSchema = z.object({
+    id: z.string({ required_error: "O ID da categoria é obrigatório" }),
+  });
+
+  try {
+    const validation = paramsSchema.safeParse(request.params);
+
+    if (!validation.success) {
+      throw validation.error;
+    }
+
+    const { id } = validation.data;
+
+    const category = await categoryService.listCategoryById(id);
+
+    if (!category) {
+      throw new AppError("Categoria não encontrada", StatusCodes.NOT_FOUND);
+    }
+
+    reply.code(StatusCodes.OK).send(category);
+  } catch (error) {
+    handleErrorResponse(error, reply);
+  }
+};
+
+const deleteCategory = async (request, reply) => {
+  const paramsSchema = z.object({
+    id: z.string({ required_error: "O ID da categoria é obrigatório" }),
+  });
+
+  try {
+    const validation = paramsSchema.safeParse(request.params);
+
+    if (!validation.success) {
+      throw validation.error;
+    }
+
+    const { id } = validation.data;
+
+    const category = await categoryService.deleteCategory(id);
+
+    if (!category) {
+      throw new AppError("Categoria não encontrada", StatusCodes.NOT_FOUND);
+    }
+
+    reply
+      .code(StatusCodes.OK)
+      .send({ message: "Categoria deletada com sucesso" });
+  } catch (error) {
+    handleErrorResponse(error, reply);
+  }
+};
+
+const updateCategory = async (request, reply) => {
+  const paramsSchema = z.object({
+    id: z.string({ required_error: "O ID da categoria é obrigatório" }),
+  });
+
+  const bodySchema = z.object({
+    name: z.string().optional(),
+    type: z.enum(["INCOME", "EXPENSE"]).optional(),
+    color: z.string().optional(),
+    icon: z.string().optional(),
+  });
+
+  try {
+    const paramsValidation = paramsSchema.safeParse(request.params);
+    const bodyValidation = bodySchema.safeParse(request.body);
+
+    if (!paramsValidation.success || !bodyValidation.success) {
+      throw new z.ZodError([
+        ...paramsValidation.error.errors,
+        ...bodyValidation.error.errors,
+      ]);
+    }
+
+    const { id } = paramsValidation.data;
+    const data = bodyValidation.data;
+
+    const category = await categoryService.updateCategory(id, data);
+
+    if (!category) {
+      throw new AppError("Categoria não encontrada", StatusCodes.NOT_FOUND);
+    }
+
+    reply.code(StatusCodes.OK).send(category);
+  } catch (error) {
+    handleErrorResponse(error, reply);
+  }
+};
+
 export default {
   createCategory,
+  listCategories,
+  listCategoryById,
+  deleteCategory,
+  updateCategory,
 };

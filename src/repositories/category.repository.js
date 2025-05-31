@@ -23,6 +23,58 @@ const createCategory = async (userId, name, type, color, icon) => {
   }
 };
 
+const listCategories = async (userId, type) => {
+  try {
+    const categories = await prisma.category.findMany({
+      where: {
+        ...(userId && { userId }),
+        ...(type && { type }),
+      },
+    });
+    return categories;
+  } catch (error) {
+    logError(error);
+  }
+};
+
+const listCategoryById = async (id) => {
+  try {
+    const category = await prisma.category.findUnique({
+      where: { id },
+    });
+    return category;
+  } catch (error) {
+    logError(error);
+  }
+};
+
+const deleteCategory = async (id) => {
+  try {
+    const category = await prisma.category.delete({
+      where: { id },
+    });
+    return category;
+  } catch (error) {
+    logError(error);
+  }
+};
+
+const updateCategory = async (id, data) => {
+  try {
+    const category = await prisma.category.update({
+      where: { id },
+      data,
+    });
+    return category;
+  } catch (error) {
+    logError(error);
+  }
+};
+
 export default {
   createCategory,
+  listCategories,
+  listCategoryById,
+  deleteCategory,
+  updateCategory,
 };
