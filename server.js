@@ -1,6 +1,8 @@
 import fastify from "fastify";
 import cors from "@fastify/cors";
+import routes from "./src/routes/index.js";
 import { clerkPlugin } from "@clerk/fastify";
+import environment from "./src/config/envs.js"
 
 const app = fastify({
   pluginTimeout: 60000,
@@ -15,19 +17,19 @@ app.register(cors, {
 });
 
 app.register(clerkPlugin, {
-  secretKey: process.env.CLERK_SECRET_KEY,
-  publishableKey: process.env.CLERK_PUBLISHABLE_KEY,
+  secretKey: environment.secretKey,
+  publishableKey: environment.publishableKey,
 });
 
-// app.register(routes);
+app.register(routes);
 
 app
   .listen({
-    port: process.env.PORT || 8080,
+    port: environment.port || 8080,
     host: "0.0.0.0",
   })
   .then(() => {
-    console.log(`Server is running on port ${process.env.PORT || 3000}`);
+    console.log(`Server is running on port ${environment.port || 8080}`);
   })
   .catch((err) => {
     console.error("Error starting server:", err);
