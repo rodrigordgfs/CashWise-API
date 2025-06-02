@@ -37,6 +37,22 @@ const listCategories = async (userId, type) => {
   }
 };
 
+const listCategoriesWithTransactions = async (userId) => {
+  try {
+    const categories = await prisma.category.findMany({
+      where: {
+        ...(userId && { userId }),
+      },
+      include: {
+        Transaction: true,
+      },
+    });
+    return categories;
+  } catch (error) {
+    logError(error);
+  }
+};
+
 const listCategoryById = async (id) => {
   try {
     const category = await prisma.category.findUnique({
@@ -75,6 +91,7 @@ export default {
   createCategory,
   listCategories,
   listCategoryById,
+  listCategoriesWithTransactions,
   deleteCategory,
   updateCategory,
 };

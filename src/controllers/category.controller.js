@@ -1,29 +1,7 @@
 import { z } from "zod";
 import { StatusCodes } from "http-status-codes";
 import categoryService from "../services/category.service.js";
-import AppError from "../utils/error.js";
-
-const handleErrorResponse = (error, reply) => {
-  if (error instanceof z.ZodError) {
-    return reply.code(StatusCodes.BAD_REQUEST).send({
-      message: "Erro de validação",
-      errors: error.errors.map((err) => ({
-        field: err.path.length > 0 ? err.path.join(".") : "body",
-        message: err.message,
-      })),
-    });
-  }
-
-  const statusCode =
-    error instanceof AppError
-      ? StatusCodes.BAD_REQUEST
-      : StatusCodes.INTERNAL_SERVER_ERROR;
-
-  return reply.code(statusCode).send({
-    message: error.message || "Ocorreu um erro interno",
-    ...(error.details && { details: error.details }),
-  });
-};
+import AppError, { handleErrorResponse } from "../utils/error.js";
 
 const createCategory = async (request, reply) => {
   const categorySchema = z.object({
@@ -67,7 +45,7 @@ const createCategory = async (request, reply) => {
 
 const listCategories = async (request, reply) => {
   const querySchema = z.object({
-    userId: z.string().optional(),
+    userId: z.string({ required_error: "O ID do usuário é obrigatório" }),
     type: z.enum(["INCOME", "EXPENSE"]).optional(),
   });
 

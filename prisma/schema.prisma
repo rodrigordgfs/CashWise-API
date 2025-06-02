@@ -15,15 +15,48 @@ enum CategoryType {
 }
 
 model Category {
-  id        String       @id @default(uuid())
-  userId    String
-  name      String       @unique
-  type      CategoryType
-  color     String
-  icon      String
-  createdAt DateTime     @default(now())
-  updatedAt DateTime     @updatedAt
+  id          String        @id @default(uuid())
+  userId      String
+  name        String        @unique
+  type        CategoryType
+  color       String
+  icon        String
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+  Transaction Transaction[]
+  Budget      Budget[]
 
   @@index([userId])
   @@map("categories")
+}
+
+model Transaction {
+  id          String       @id @default(uuid())
+  userId      String
+  type        CategoryType
+  description String
+  categoryId  String
+  date        DateTime
+  account     String
+  amount      Float
+  category    Category     @relation(fields: [categoryId], references: [id])
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+
+  @@index([userId])
+  @@map("transactions")
+}
+
+model Budget {
+  id         String   @id @default(uuid())
+  userId     String
+  categoryId String
+  limit      Float
+  date       DateTime
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  category   Category @relation(fields: [categoryId], references: [id])
+
+  @@index([userId])
+  @@map("budgets")
 }
