@@ -47,7 +47,7 @@ const listMonthlyReports = async (userId, period__gte) => {
 
     result.sort((a, b) => {
       const parseDateSafe = (str) =>
-        parse(str, "MMM/yyyy", new Date(), { locale: ptBR });
+        parseISO(str, "MMM/yyyy", new Date(), { locale: ptBR });
 
       const dateA = parseDateSafe(a.name);
       const dateB = parseDateSafe(b.name);
