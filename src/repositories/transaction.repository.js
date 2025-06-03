@@ -68,6 +68,7 @@ const listTransactions = async (
         date: true,
         account: true,
         amount: true,
+        paid: true,
         category: {
           select: {
             id: true,
@@ -90,6 +91,9 @@ const listTransactionById = async (id) => {
   try {
     const transaction = await prisma.transaction.findUnique({
       where: { id },
+      include: {
+        category: true
+      },
     });
     return transaction;
   } catch (error) {
