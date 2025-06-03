@@ -1,14 +1,14 @@
-// import clerkAuth from "../middleware/clerkAuth.js";
+import clerkAuth from "../middleware/clerkAuth.js";
 import categoryRoute from "./category.route.js";
 import transactionRoute from "./transaction.route.js";
 import budgetRoute from "./budget.route.js";
 import reportRoute from "./report.route.js";
-// import enviroment from "../config/envs.js";
+import enviroment from "../config/envs.js";
 
 const routes = async (fastify) => {
-  // if (enviroment.env !== "development") {
-  //   fastify.addHook("preHandler", clerkAuth);
-  // }
+  if (enviroment.env !== "development") {
+    fastify.addHook("preHandler", clerkAuth);
+  }
   fastify.register(categoryRoute);
   fastify.register(transactionRoute);
   fastify.register(budgetRoute);
