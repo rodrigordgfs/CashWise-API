@@ -57,7 +57,7 @@ const listTransactions = async (
         }),
       },
       orderBy: {
-        description: sort === "desc" ? "desc" : "asc",
+        date: sort === "desc" ? "desc" : "asc",
       },
       ...(limit && { take: limit }),
       select: {
