@@ -3,6 +3,7 @@ import AppError from "../utils/error.js";
 import { invalidateTransactionCache } from "../utils/invalidateTransactionCache.js";
 import { saveRedisCache } from "../utils/saveRedisCache.js";
 import { getRedisCache } from "../utils/getRedisCache.js";
+import { generateCacheKey } from "../utils/generateCacheKey.js";
 
 const createGoal = async (
   userId,
@@ -34,7 +35,8 @@ const createGoal = async (
 
 const listGoals = async (userId) => {
   try {
-    const cache = getRedisCache("goals", { userId });
+    const cacheKey = generateCacheKey("goals", { userId });
+    const cache = await getRedisCache(cacheKey);
 
     if (cache) {
       return cache;
@@ -50,7 +52,8 @@ const listGoals = async (userId) => {
 
 const listGoalById = async (id) => {
   try {
-    const cache = getRedisCache("goals", { id });
+    const cacheKey = generateCacheKey("goals", { id });
+    const cache = await getRedisCache(cacheKey);
 
     if (cache) {
       return cache;

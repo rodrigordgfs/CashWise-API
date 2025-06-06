@@ -5,16 +5,18 @@ import { format, isAfter, parseISO } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { saveRedisCache } from "../utils/saveRedisCache.js";
 import { getRedisCache } from "../utils/getRedisCache.js";
+import { generateCacheKey } from "../utils/generateCacheKey.js";
 
 const capitalize = (str) =>
   str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
 
 const listMonthlyReports = async (userId, period__gte) => {
   try {
-    const cache = getRedisCache("monthlyReports", {
+    const cacheKey = generateCacheKey("monthlyReports", {
       userId,
       period__gte,
     });
+    const cache = await getRedisCache(cacheKey);
 
     if (cache) {
       return cache;
@@ -76,10 +78,11 @@ const listMonthlyReports = async (userId, period__gte) => {
 
 const listCategoriesReports = async (userId, period__gte) => {
   try {
-    const cache = getRedisCache("categoriesReports", {
+    const cacheKey = generateCacheKey("categoriesReports", {
       userId,
       period__gte,
     });
+    const cache = await getRedisCache(cacheKey);
 
     if (cache) {
       return cache;
@@ -121,10 +124,11 @@ const listCategoriesReports = async (userId, period__gte) => {
 
 const listBalanceReports = async (userId, period__gte) => {
   try {
-    const cache = getRedisCache("balanceReports", {
+    const cacheKey = generateCacheKey("balanceReports", {
       userId,
       period__gte,
     });
+    const cache = await getRedisCache(cacheKey);
 
     if (cache) {
       return cache;
@@ -194,10 +198,11 @@ const listBalanceReports = async (userId, period__gte) => {
 
 const listSummaryReports = async (userId, period__gte) => {
   try {
-    const cache = getRedisCache("summaryReports", {
+    const cacheKey = generateCacheKey("summaryReports", {
       userId,
       period__gte,
     });
+    const cache = await getRedisCache(cacheKey);
 
     if (cache) {
       return cache;

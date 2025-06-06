@@ -14,7 +14,8 @@
     "prisma:studio": "prisma studio",
     "postinstall": "npm run prisma:generate",
     "seed": "npx prisma migrate reset --force && node prisma/seed.js",
-    "new-route": "node newRoute.js"
+    "new-route": "node newRoute.js",
+    "lint": "eslint ."
   },
   "keywords": [],
   "author": "",
@@ -34,6 +35,9 @@
     "zod": "^3.25.36"
   },
   "devDependencies": {
+    "@eslint/js": "^9.28.0",
+    "eslint": "^9.28.0",
+    "globals": "^16.2.0",
     "nodemon": "^3.1.10",
     "prisma": "^6.9.0"
   }

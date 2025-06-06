@@ -4,7 +4,8 @@ import categoryRepository from "../repositories/category.repository.js";
 import AppError from "../utils/error.js";
 import { invalidateTransactionCache } from "../utils/invalidateTransactionCache.js";
 import { saveRedisCache } from "../utils/saveRedisCache.js";
-import { getRedisCache } from "../utils/getRedisCache.js"
+import { getRedisCache } from "../utils/getRedisCache.js";
+import { generateCacheKey } from "../utils/generateCacheKey.js";
 
 const createBudget = async (userId, categoryId, limit, date) => {
   try {
@@ -32,7 +33,8 @@ const createBudget = async (userId, categoryId, limit, date) => {
 
 const listBudgets = async (userId) => {
   try {
-    const cache = getRedisCache("budgets", { userId });
+    const cacheKey = generateCacheKey("budgets", { userId });
+    const cache = await getRedisCache(cacheKey);
 
     if (cache) {
       return cache;
@@ -77,11 +79,14 @@ const listBudgets = async (userId) => {
 
 const listBudgetById = async (id) => {
   try {
-    const cache = getRedisCache("budgets", { id });
+    const cacheKey = generateCacheKey("budgets", { id });
+    const cache = await getRedisCache(cacheKey);
 
     if (cache) {
       return cache;
     }
+
+    const budget = await budgetRepository.listBudgetById(id);
 
     const category = await categoryRepository.listCategoryById(
       budget.categoryId

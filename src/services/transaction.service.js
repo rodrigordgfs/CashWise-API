@@ -3,6 +3,7 @@ import AppError from "../utils/error.js";
 import { invalidateTransactionCache } from "../utils/invalidateTransactionCache.js";
 import { saveRedisCache } from "../utils/saveRedisCache.js";
 import { getRedisCache } from "../utils/getRedisCache.js";
+import { generateCacheKey } from "../utils/generateCacheKey.js";
 
 const createTransaction = async (
   userId,
@@ -42,7 +43,7 @@ const listTransactions = async (
   limit
 ) => {
   try {
-    const cache = getRedisCache("transactions", {
+    const cacheKey = generateCacheKey("transactions", {
       userId,
       type,
       date,
@@ -51,6 +52,7 @@ const listTransactions = async (
       search,
       limit,
     });
+    const cache = await getRedisCache(cacheKey);
 
     if (cache) {
       return cache;
@@ -76,7 +78,8 @@ const listTransactions = async (
 
 const listTransactionById = async (id) => {
   try {
-    const cache = getRedisCache("transactions", { id });
+    const cacheKey = generateCacheKey("transactions", { id });
+    const cache = await getRedisCache(cacheKey);
 
     if (cache) {
       return cache;

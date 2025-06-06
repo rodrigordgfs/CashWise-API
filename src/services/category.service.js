@@ -3,6 +3,7 @@ import AppError from "../utils/error.js";
 import { invalidateTransactionCache } from "../utils/invalidateTransactionCache.js";
 import { saveRedisCache } from "../utils/saveRedisCache.js";
 import { getRedisCache } from "../utils/getRedisCache.js";
+import { generateCacheKey } from "../utils/generateCacheKey.js";
 
 const createCategory = async (userId, name, type, color, icon) => {
   try {
@@ -25,7 +26,8 @@ const createCategory = async (userId, name, type, color, icon) => {
 
 const listCategories = async (userId, type) => {
   try {
-    const cache = getRedisCache("categories", { userId, type });
+    const cacheKey = generateCacheKey("categories", { userId, type });
+    const cache = await getRedisCache(cacheKey);
 
     if (cache) {
       return cache;
@@ -41,7 +43,8 @@ const listCategories = async (userId, type) => {
 
 const listCategoryById = async (id) => {
   try {
-    const cache = getRedisCache("categories", { id });
+    const cacheKey = generateCacheKey("categories", { id });
+    const cache = await getRedisCache(cacheKey);
 
     if (cache) {
       return cache;
