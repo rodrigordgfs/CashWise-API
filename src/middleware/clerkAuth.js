@@ -1,4 +1,6 @@
-import { getAuth } from "@clerk/fastify";
+import { createRequire } from 'node:module';
+const require = createRequire(import.meta.url);
+const { getAuth } = require('@clerk/fastify');
 
 const clerkAuth = async (request, reply) => {
   try {
