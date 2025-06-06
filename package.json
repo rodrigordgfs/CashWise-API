@@ -23,17 +23,18 @@
     "@clerk/fastify": "^2.2.23",
     "@fastify/caching": "^9.0.3",
     "@fastify/cors": "^11.0.1",
-    "@prisma/client": "^6.8.2",
+    "@prisma/client": "^6.9.0",
     "axios": "^1.9.0",
     "date-fns": "^4.1.0",
     "dotenv": "^16.5.0",
     "fastify": "^5.3.3",
     "http-status-codes": "^2.3.0",
+    "redis": "^5.5.5",
     "uuid": "^11.1.0",
     "zod": "^3.25.36"
   },
   "devDependencies": {
     "nodemon": "^3.1.10",
-    "prisma": "^6.8.2"
+    "prisma": "^6.9.0"
   }
 }
