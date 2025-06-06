@@ -1,0 +1,33 @@
+version: "3.8"
+
+services:
+  cashwise_postgres:
+    image: postgres:15
+    restart: always
+    container_name: cashwise_postgres
+    environment:
+      POSTGRES_USER: shinodalabs
+      POSTGRES_PASSWORD: shinodalabs
+      POSTGRES_DB: cashwise
+    volumes:
+      - cashwise_pgdata:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    networks:
+      - cashwise_network
+
+  cashwise_redis:
+    image: redis:7
+    restart: always
+    container_name: cashwise_redis
+    ports:
+      - "6379:6379"
+    networks:
+      - cashwise_network
+
+networks:
+  cashwise_network:
+    driver: bridge
+
+volumes:
+  cashwise_pgdata:
