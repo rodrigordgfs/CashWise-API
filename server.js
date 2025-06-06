@@ -1,8 +1,11 @@
 import fastify from "fastify";
 import cors from "@fastify/cors";
 import routes from "./src/routes/index.js";
-import { clerkPlugin } from "@clerk/fastify";
-import environment from "./src/config/envs.js"
+import { createRequire } from "node:module";
+import environment from "./src/config/envs.js";
+
+const require = createRequire(import.meta.url);
+const { clerkPlugin } = require("@clerk/fastify");
 
 const app = fastify({
   pluginTimeout: 60000,
@@ -11,9 +14,9 @@ const app = fastify({
 
 app.register(cors, {
   origin: true,
-  methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"], 
+  methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
   allowedHeaders: "*",
-  credentials: true, 
+  credentials: true,
 });
 
 app.register(clerkPlugin, {
