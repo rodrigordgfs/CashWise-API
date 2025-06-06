@@ -9,8 +9,8 @@
   "scripts": {
     "docker-up": "docker-compose up -d",
     "docker-down": "docker-compose down -v",
-    "start": "node src/server.js",
-    "dev": "nodemon src/server.js",
+    "start": "node server.js",
+    "dev": "nodemon server.js",
     "prisma:migrate": "npx prisma migrate dev",
     "prisma:generate": "prisma generate",
     "prisma:migrate-deploy": "prisma migrate deploy",
