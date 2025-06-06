@@ -2,12 +2,7 @@ import { createClient } from "redis";
 import environment from "../config/envs.js";
 
 const redisClient = createClient({
-  username: environment.redisUsername,
-  password: environment.redisPassword,
-  socket: {
-      host: environment.redisHost,
-      port: environment.redisPort
-  }
+  url: environment.redisUrl,
 });
 
 redisClient.on("error", (err) => {
