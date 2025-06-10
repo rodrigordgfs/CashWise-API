@@ -3,25 +3,12 @@ import transactionRepository from "../repositories/transaction.repository.js";
 import categoryRepository from "../repositories/category.repository.js";
 import { format, isAfter, parseISO } from "date-fns";
 import { ptBR } from "date-fns/locale";
-import { saveRedisCache } from "../utils/saveRedisCache.js";
-import { getRedisCache } from "../utils/getRedisCache.js";
-import { generateCacheKey } from "../utils/generateCacheKey.js";
 
 const capitalize = (str) =>
   str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
 
 const listMonthlyReports = async (userId, period__gte) => {
   try {
-    const cacheKey = generateCacheKey("monthlyReports", {
-      userId,
-      period__gte,
-    });
-    const cache = await getRedisCache(cacheKey);
-
-    if (cache) {
-      return cache;
-    }
-
     const periodDate = new Date(period__gte);
     const transactions = await transactionRepository.listTransactions(
       userId,
@@ -68,8 +55,6 @@ const listMonthlyReports = async (userId, period__gte) => {
       return dateA.getTime() - dateB.getTime();
     });
 
-    await saveRedisCache(cacheKey, result);
-
     return result;
   } catch (error) {
     throw new AppError(error.message);
@@ -78,16 +63,6 @@ const listMonthlyReports = async (userId, period__gte) => {
 
 const listCategoriesReports = async (userId, period__gte) => {
   try {
-    const cacheKey = generateCacheKey("categoriesReports", {
-      userId,
-      period__gte,
-    });
-    const cache = await getRedisCache(cacheKey);
-
-    if (cache) {
-      return cache;
-    }
-
     const periodDate = new Date(period__gte);
     const categories = await categoryRepository.listCategoriesWithTransactions(
       userId
@@ -114,8 +89,6 @@ const listCategoriesReports = async (userId, period__gte) => {
       })
       .filter((c) => c.value > 0);
 
-    await saveRedisCache(cacheKey, result);
-
     return result;
   } catch (error) {
     throw new AppError(error.message);
@@ -124,16 +97,6 @@ const listCategoriesReports = async (userId, period__gte) => {
 
 const listBalanceReports = async (userId, period__gte) => {
   try {
-    const cacheKey = generateCacheKey("balanceReports", {
-      userId,
-      period__gte,
-    });
-    const cache = await getRedisCache(cacheKey);
-
-    if (cache) {
-      return cache;
-    }
-
     const periodDate = new Date(period__gte);
     const transactions = await transactionRepository.listTransactions(
       userId,
@@ -188,8 +151,6 @@ const listBalanceReports = async (userId, period__gte) => {
       return aIndex - bIndex;
     });
 
-    await saveRedisCache(cacheKey, result);
-
     return result;
   } catch (error) {
     throw new AppError(error.message);
@@ -198,16 +159,6 @@ const listBalanceReports = async (userId, period__gte) => {
 
 const listSummaryReports = async (userId, period__gte) => {
   try {
-    const cacheKey = generateCacheKey("summaryReports", {
-      userId,
-      period__gte,
-    });
-    const cache = await getRedisCache(cacheKey);
-
-    if (cache) {
-      return cache;
-    }
-
     const transactions = await transactionRepository.listTransactions(
       userId,
       null,
@@ -238,8 +189,6 @@ const listSummaryReports = async (userId, period__gte) => {
       expense: Number(summary.expense.toFixed(2)),
       balance: Number(summary.balance.toFixed(2)),
     };
-
-    await saveRedisCache(cacheKey, result);
 
     return result;
   } catch (error) {

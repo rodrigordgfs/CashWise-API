@@ -16,26 +16,6 @@ services:
     networks:
       - cashwise_network
 
-  cashwise_redis:
-    image: redis:7
-    restart: always
-    container_name: cashwise_redis
-    ports:
-      - "6379:6379"
-    networks:
-      - cashwise_network
-
-  redis_commander:
-    image: rediscommander/redis-commander:latest
-    container_name: redis_commander
-    restart: always
-    environment:
-      - REDIS_HOSTS=local:cashwise_redis:6379
-    ports:
-      - "8081:8081"
-    networks:
-      - cashwise_network
-
 networks:
   cashwise_network:
     driver: bridge

@@ -5,7 +5,6 @@ const environment = {
   env: process.env.NODE_ENV || "development",
   publishableKey: process.env.CLERK_PUBLISHABLE_KEY,
   secretKey: process.env.CLERK_SECRET_KEY,
-  redisUrl: process.env.REDIS_URL
 };
 
 export default environment;

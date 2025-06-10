@@ -2,10 +2,6 @@ import budgetRepository from "../repositories/budget.repository.js";
 import transactionRepository from "../repositories/transaction.repository.js";
 import categoryRepository from "../repositories/category.repository.js";
 import AppError from "../utils/error.js";
-import { invalidateTransactionCache } from "../utils/invalidateTransactionCache.js";
-import { saveRedisCache } from "../utils/saveRedisCache.js";
-import { getRedisCache } from "../utils/getRedisCache.js";
-import { generateCacheKey } from "../utils/generateCacheKey.js";
 
 const createBudget = async (userId, categoryId, limit, date) => {
   try {
@@ -16,8 +12,6 @@ const createBudget = async (userId, categoryId, limit, date) => {
     const spent = Number(
       transactions.reduce((sum, tx) => sum + tx.amount, 0)
     ).toFixed(2);
-
-    await invalidateTransactionCache("budgets");
 
     return {
       userId,
@@ -33,13 +27,6 @@ const createBudget = async (userId, categoryId, limit, date) => {
 
 const listBudgets = async (userId) => {
   try {
-    const cacheKey = generateCacheKey("budgets", { userId });
-    const cache = await getRedisCache(cacheKey);
-
-    if (cache) {
-      return cache;
-    }
-
     const budgets = await budgetRepository.listBudgetsByUser(userId);
 
     const result = await Promise.all(
@@ -65,8 +52,6 @@ const listBudgets = async (userId) => {
           date: budget.date,
         };
 
-        await saveRedisCache(cacheKey, data);
-
         return data;
       })
     );
@@ -79,13 +64,6 @@ const listBudgets = async (userId) => {
 
 const listBudgetById = async (id) => {
   try {
-    const cacheKey = generateCacheKey("budgets", { id });
-    const cache = await getRedisCache(cacheKey);
-
-    if (cache) {
-      return cache;
-    }
-
     const budget = await budgetRepository.listBudgetById(id);
 
     const category = await categoryRepository.listCategoryById(
@@ -109,9 +87,7 @@ const listBudgetById = async (id) => {
       date: budget.date,
     };
 
-    await saveRedisCache(cacheKey, data);
-
-    return;
+    return data;
   } catch (error) {
     throw new AppError(error.message);
   }
@@ -120,7 +96,6 @@ const listBudgetById = async (id) => {
 const deleteBudget = async (id) => {
   try {
     const deleted = await budgetRepository.deleteBudget(id);
-    await invalidateTransactionCache("budgets");
     return { id: deleted.id, deleted: true };
   } catch (error) {
     throw new AppError(error.message);
@@ -151,8 +126,6 @@ const updateBudget = async (
     const spent = Number(
       transactions.reduce((sum, tx) => sum + tx.amount, 0)
     ).toFixed(2);
-
-    await invalidateTransactionCache("budgets");
 
     return {
       id: budget.id,

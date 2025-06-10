@@ -1,9 +1,6 @@
 import categoryRepository from "../repositories/category.repository.js";
 import AppError from "../utils/error.js";
 import { invalidateTransactionCache } from "../utils/invalidateTransactionCache.js";
-import { saveRedisCache } from "../utils/saveRedisCache.js";
-import { getRedisCache } from "../utils/getRedisCache.js";
-import { generateCacheKey } from "../utils/generateCacheKey.js";
 
 const createCategory = async (userId, name, type, color, icon) => {
   try {
@@ -15,9 +12,6 @@ const createCategory = async (userId, name, type, color, icon) => {
       icon
     );
 
-    await invalidateTransactionCache("categories");
-    await invalidateTransactionCache("goals");
-
     return category;
   } catch (error) {
     throw new AppError(error.message);
@@ -26,15 +20,7 @@ const createCategory = async (userId, name, type, color, icon) => {
 
 const listCategories = async (userId, type) => {
   try {
-    const cacheKey = generateCacheKey("categories", { userId, type });
-    const cache = await getRedisCache(cacheKey);
-
-    if (cache) {
-      return cache;
-    }
-
     const categories = await categoryRepository.listCategories(userId, type);
-    await saveRedisCache(cacheKey, categories);
     return categories;
   } catch (error) {
     throw new AppError(error.message);
@@ -43,15 +29,7 @@ const listCategories = async (userId, type) => {
 
 const listCategoryById = async (id) => {
   try {
-    const cacheKey = generateCacheKey("categories", { id });
-    const cache = await getRedisCache(cacheKey);
-
-    if (cache) {
-      return cache;
-    }
-
     const category = await categoryRepository.listCategoryById(id);
-    await saveRedisCache(cacheKey, category);
     return category;
   } catch (error) {
     throw new AppError(error.message);
