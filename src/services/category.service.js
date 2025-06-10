@@ -1,6 +1,5 @@
 import categoryRepository from "../repositories/category.repository.js";
 import AppError from "../utils/error.js";
-import { invalidateTransactionCache } from "../utils/invalidateTransactionCache.js";
 
 const createCategory = async (userId, name, type, color, icon) => {
   try {
@@ -39,8 +38,6 @@ const listCategoryById = async (id) => {
 const deleteCategory = async (id) => {
   try {
     const category = await categoryRepository.deleteCategory(id);
-    await invalidateTransactionCache("categories");
-    await invalidateTransactionCache("goals");
     return category;
   } catch (error) {
     throw new AppError(error.message);
@@ -50,8 +47,6 @@ const deleteCategory = async (id) => {
 const updateCategory = async (id, data) => {
   try {
     const category = await categoryRepository.updateCategory(id, data);
-    await invalidateTransactionCache("categories");
-    await invalidateTransactionCache("goals");
     return category;
   } catch (error) {
     throw new AppError(error.message);
