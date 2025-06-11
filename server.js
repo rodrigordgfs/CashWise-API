@@ -12,8 +12,12 @@ const app = fastify({
   bodyLimit: 10 * 1024 * 1024,
 });
 
+const isProduction = environment.env === "production";
+
 app.register(cors, {
-  origin: true,
+  origin: isProduction
+    ? "https://www.appcashwise.com.br"
+    : ["http://localhost:3000", "http://127.0.0.1:3000"],
   methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
   allowedHeaders: "*",
   credentials: true,
