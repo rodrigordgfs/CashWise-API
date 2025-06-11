@@ -8,7 +8,6 @@ const createTransaction = async (request, reply) => {
   const userId = await getUserIdFromRequest(request);
 
   const transactionSchema = z.object({
-    userId: z.string().min(1, { message: "O ID do usuário é obrigatório" }),
     type: z.enum(["INCOME", "EXPENSE"], {
       required_error: "O tipo de transação é obrigatório",
     }),
