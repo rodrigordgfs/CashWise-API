@@ -2,12 +2,12 @@ import { z } from "zod";
 import { StatusCodes } from "http-status-codes";
 import goalService from "../services/goal.service.js";
 import AppError, { handleErrorResponse } from "../utils/error.js";
+import { getUserIdFromRequest } from "../utils/getUserId.js";
 
 const createGoal = async (request, reply) => {
+  const userId = await getUserIdFromRequest(request);
+
   const goalSchema = z.object({
-    userId: z
-      .string({ required_error: "O ID do usuário é obrigatório" })
-      .min(1, { message: "O ID do usuário é obrigatório" }),
     categoryId: z
       .string({ required_error: "O ID da categoria é obrigatório" })
       .min(1, { message: "O ID da categoria é obrigatório" }),
@@ -31,7 +31,6 @@ const createGoal = async (request, reply) => {
     }
 
     const {
-      userId,
       categoryId,
       title,
       description,
@@ -57,19 +56,9 @@ const createGoal = async (request, reply) => {
 };
 
 const listGoals = async (request, reply) => {
-  const querySchema = z.object({
-    userId: z.string({ required_error: "O ID do usuário é obrigatório" }),
-  });
+  const userId = await getUserIdFromRequest(request);
 
   try {
-    const validation = querySchema.safeParse(request.query);
-
-    if (!validation.success) {
-      throw validation.error;
-    }
-
-    const { userId } = validation.data;
-
     const goals = await goalService.listGoals(userId);
 
     reply.code(StatusCodes.OK).send(goals);

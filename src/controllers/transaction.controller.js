@@ -2,12 +2,13 @@ import { z } from "zod";
 import { StatusCodes } from "http-status-codes";
 import transactionService from "../services/transaction.service.js";
 import AppError, { handleErrorResponse } from "../utils/error.js";
+import { getUserIdFromRequest } from "../utils/getUserId.js";
 
 const createTransaction = async (request, reply) => {
+  const userId = await getUserIdFromRequest(request);
+
   const transactionSchema = z.object({
-    userId: z
-      .string({ required_error: "O ID do usuário é obrigatório" })
-      .min(1, { message: "O ID do usuário é obrigatório" }),
+    userId: z.string().min(1, { message: "O ID do usuário é obrigatório" }),
     type: z.enum(["INCOME", "EXPENSE"], {
       required_error: "O tipo de transação é obrigatório",
     }),
@@ -33,7 +34,7 @@ const createTransaction = async (request, reply) => {
       throw validation.error;
     }
 
-    const { userId, type, description, categoryId, date, account, amount } =
+    const { type, description, categoryId, date, account, amount } =
       validation.data;
 
     const transaction = await transactionService.createTransaction(
@@ -53,8 +54,9 @@ const createTransaction = async (request, reply) => {
 };
 
 const listTransactions = async (request, reply) => {
+  const userId = await getUserIdFromRequest(request);
+
   const querySchema = z.object({
-    userId: z.string({ required_error: "O ID do usuário é obrigatório" }),
     type: z.enum(["INCOME", "EXPENSE"]).optional(),
     date: z
       .string()
@@ -86,8 +88,7 @@ const listTransactions = async (request, reply) => {
       throw validation.error;
     }
 
-    const { userId, type, date, sort, search, limit, date__gte } =
-      validation.data;
+    const { type, date, sort, search, limit, date__gte } = validation.data;
 
     const transactions = await transactionService.listTransactions(
       userId,
@@ -163,7 +164,6 @@ const updateTransaction = async (request, reply) => {
   });
 
   const bodySchema = z.object({
-    userId: z.string().min(1, "O ID do usuário é obrigatório"),
     type: z.enum(["INCOME", "EXPENSE"]).optional(),
     description: z.string().min(1, "A descrição é obrigatória").optional(),
     categoryId: z.string().min(1, "O ID da categoria é obrigatório").optional(),

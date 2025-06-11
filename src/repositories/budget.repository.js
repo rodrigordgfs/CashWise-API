@@ -62,15 +62,11 @@ const deleteBudget = async (id) => {
   }
 };
 
-const updateBudget = async (
-  id,
-  { userId, categoryId, icon, color, limit, date }
-) => {
+const updateBudget = async (id, { categoryId, icon, color, limit, date }) => {
   try {
     return await prisma.budget.update({
       where: { id },
       data: {
-        userId,
         categoryId,
         icon,
         color,

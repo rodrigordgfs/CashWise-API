@@ -2,12 +2,12 @@ import { z } from "zod";
 import { StatusCodes } from "http-status-codes";
 import categoryService from "../services/category.service.js";
 import AppError, { handleErrorResponse } from "../utils/error.js";
+import { getUserIdFromRequest } from "../utils/getUserId.js";
 
 const createCategory = async (request, reply) => {
+  const userId = await getUserIdFromRequest(request);
+
   const categorySchema = z.object({
-    userId: z
-      .string({ required_error: "O ID do usuário é obrigatório" })
-      .min(1, { message: "O ID do usuário é obrigatório" }),
     name: z.string({ required_error: "O nome da categoria é obrigatório" }),
     type: z.enum(["INCOME", "EXPENSE"], {
       required_error: "O tipo de categoria é obrigatório",
@@ -27,7 +27,7 @@ const createCategory = async (request, reply) => {
       throw validation.error;
     }
 
-    const { userId, name, type, color, icon } = validation.data;
+    const { name, type, color, icon } = validation.data;
 
     const category = await categoryService.createCategory(
       userId,
@@ -44,8 +44,9 @@ const createCategory = async (request, reply) => {
 };
 
 const listCategories = async (request, reply) => {
+  const userId = await getUserIdFromRequest(request);
+
   const querySchema = z.object({
-    userId: z.string({ required_error: "O ID do usuário é obrigatório" }),
     type: z.enum(["INCOME", "EXPENSE"]).optional(),
   });
 
@@ -56,7 +57,7 @@ const listCategories = async (request, reply) => {
       throw validation.error;
     }
 
-    const { userId, type } = validation.data;
+    const { type } = validation.data;
 
     const categories = await categoryService.listCategories(userId, type);
 

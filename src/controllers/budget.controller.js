@@ -2,10 +2,12 @@ import { z } from "zod";
 import { StatusCodes } from "http-status-codes";
 import budgetService from "../services/budget.service.js";
 import AppError, { handleErrorResponse } from "../utils/error.js";
+import { getUserIdFromRequest } from "../utils/getUserId.js";
 
 const createBudget = async (request, reply) => {
+  const userId = await getUserIdFromRequest(request);
+
   const budgetSchema = z.object({
-    userId: z.string().min(1, "O ID do usuário é obrigatório"),
     categoryId: z.string().min(1, "O ID da categoria é obrigatório"),
     limit: z.number(),
     date: z.string().refine((val) => !isNaN(Date.parse(val)), {
@@ -17,7 +19,7 @@ const createBudget = async (request, reply) => {
     const validation = budgetSchema.safeParse(request.body);
     if (!validation.success) throw validation.error;
 
-    const { userId, categoryId, limit, date } = validation.data;
+    const { categoryId, limit, date } = validation.data;
 
     const budget = await budgetService.createBudget(
       userId,
@@ -33,15 +35,9 @@ const createBudget = async (request, reply) => {
 };
 
 const listBudget = async (request, reply) => {
-  const querySchema = z.object({
-    userId: z.string().min(1, "O ID do usuário é obrigatório"),
-  });
+  const userId = await getUserIdFromRequest(request);
 
   try {
-    const validation = querySchema.safeParse(request.query);
-    if (!validation.success) throw validation.error;
-
-    const { userId } = validation.data;
     const budgets = await budgetService.listBudgets(userId);
     reply.code(StatusCodes.OK).send(budgets);
   } catch (error) {
@@ -101,7 +97,6 @@ const updateBudget = async (request, reply) => {
   });
 
   const bodySchema = z.object({
-    userId: z.string().optional(),
     categoryId: z.string().optional(),
     icon: z.string().optional(),
     color: z.string().optional(),
@@ -128,12 +123,10 @@ const updateBudget = async (request, reply) => {
     }
 
     const { id } = paramsValidation.data;
-    const { userId, categoryId, icon, color, limit, date } =
-      bodyValidation.data;
+    const { categoryId, icon, color, limit, date } = bodyValidation.data;
 
     const updated = await budgetService.updateBudget(
       id,
-      userId,
       categoryId,
       icon,
       color,

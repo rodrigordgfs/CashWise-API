@@ -102,18 +102,9 @@ const deleteBudget = async (id) => {
   }
 };
 
-const updateBudget = async (
-  id,
-  userId,
-  categoryId,
-  icon,
-  color,
-  limit,
-  date
-) => {
+const updateBudget = async (id, categoryId, icon, color, limit, date) => {
   try {
     const budget = await budgetRepository.updateBudget(id, {
-      userId,
       categoryId,
       icon,
       color,
@@ -129,7 +120,7 @@ const updateBudget = async (
 
     return {
       id: budget.id,
-      userId,
+      userId: budget.userId,
       category,
       icon,
       color,
