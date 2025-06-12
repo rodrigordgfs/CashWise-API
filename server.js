@@ -12,12 +12,23 @@ const app = fastify({
   bodyLimit: 10 * 1024 * 1024,
 });
 
-const isProduction = environment.env === "production";
-
 app.register(cors, {
-  origin: isProduction
-    ? "https://www.appcashwise.com.br"
-    : ["http://localhost:3000", "http://127.0.0.1:3000"],
+  origin: (origin, cb) => {
+    const allowedOrigins = [
+      "https://appcashwise.com.br",
+      "https://www.appcashwise.com.br",
+      "https://cashwiseapi-hav8m.kinsta.app",
+      "https://www.cashwiseapi-hav8m.kinsta.app",
+      "http://localhost:3000",
+      "http://127.0.0.1:3000",
+    ];
+
+    if (!origin || allowedOrigins.includes(origin)) {
+      cb(null, true);
+    } else {
+      cb(new Error("Not allowed by CORS"), false);
+    }
+  },
   methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
   allowedHeaders: "*",
   credentials: true,
