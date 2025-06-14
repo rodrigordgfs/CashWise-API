@@ -38,6 +38,7 @@ const listTransactions = async (
   type,
   date,
   date__gte,
+  date__lte,
   sort,
   search,
   limit
@@ -49,6 +50,7 @@ const listTransactions = async (
         ...(type && { type }),
         ...(date && { date: new Date(date) }),
         ...(date__gte && { date: { gte: new Date(date__gte) } }),
+        ...(date__lte && { date: { lte: new Date(date__lte) } }),
         ...(search && {
           OR: [
             { description: { contains: search, mode: "insensitive" } },
@@ -92,7 +94,7 @@ const listTransactionById = async (id) => {
     const transaction = await prisma.transaction.findUnique({
       where: { id },
       include: {
-        category: true
+        category: true,
       },
     });
     return transaction;

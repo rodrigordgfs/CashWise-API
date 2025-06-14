@@ -69,6 +69,12 @@ const listTransactions = async (request, reply) => {
         message: "Data inválida",
       })
       .optional(),
+    date__lte: z
+      .string()
+      .refine((val) => !isNaN(Date.parse(val)), {
+        message: "Data inválida",
+      })
+      .optional(),
     sort: z.enum(["asc", "desc"]).optional(),
     search: z.string().min(1).optional(),
     limit: z
@@ -87,13 +93,15 @@ const listTransactions = async (request, reply) => {
       throw validation.error;
     }
 
-    const { type, date, sort, search, limit, date__gte } = validation.data;
+    const { type, date, sort, search, limit, date__gte, date__lte } =
+      validation.data;
 
     const transactions = await transactionService.listTransactions(
       userId,
       type,
       date,
       date__gte,
+      date__lte,
       sort,
       search,
       limit

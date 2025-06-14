@@ -32,6 +32,7 @@ const listTransactions = async (
   type,
   date,
   date__gte,
+  date__lte,
   sort,
   search,
   limit
@@ -42,6 +43,7 @@ const listTransactions = async (
       type,
       date,
       date__gte,
+      date__lte,
       sort,
       search,
       limit

@@ -9,15 +9,22 @@ const listMonthlyReports = async (request, reply) => {
     period__gte: z.string().refine((val) => !isNaN(Date.parse(val)), {
       message: "Data inválida",
     }),
+    period__lte: z.string().refine((val) => !isNaN(Date.parse(val)), {
+      message: "Data inválida",
+    }),
   });
 
   try {
     const validation = querySchema.safeParse(request.query);
     if (!validation.success) throw validation.error;
 
-    const { period__gte } = validation.data;
+    const { period__gte, period__lte } = validation.data;
     const userId = await getUserIdFromRequest(request);
-    const reports = await reportService.listMonthlyReports(userId, period__gte);
+    const reports = await reportService.listMonthlyReports(
+      userId,
+      period__gte,
+      period__lte
+    );
     reply.code(StatusCodes.OK).send(reports);
   } catch (error) {
     handleErrorResponse(error, reply);
@@ -29,17 +36,21 @@ const listCategoriesWithTransactions = async (request, reply) => {
     period__gte: z.string().refine((val) => !isNaN(Date.parse(val)), {
       message: "Data inválida",
     }),
+    period__lte: z.string().refine((val) => !isNaN(Date.parse(val)), {
+      message: "Data inválida",
+    }),
   });
 
   try {
     const validation = querySchema.safeParse(request.query);
     if (!validation.success) throw validation.error;
 
-    const { period__gte } = validation.data;
+    const { period__gte, period__lte } = validation.data;
     const userId = await getUserIdFromRequest(request);
     const categories = await reportService.listCategoriesReports(
       userId,
-      period__gte
+      period__gte,
+      period__lte
     );
     reply.code(StatusCodes.OK).send(categories);
   } catch (error) {
@@ -52,15 +63,22 @@ const listBalanceReports = async (request, reply) => {
     period__gte: z.string().refine((val) => !isNaN(Date.parse(val)), {
       message: "Data inválida",
     }),
+    period__lte: z.string().refine((val) => !isNaN(Date.parse(val)), {
+      message: "Data inválida",
+    }),
   });
 
   try {
     const validation = querySchema.safeParse(request.query);
     if (!validation.success) throw validation.error;
 
-    const { period__gte } = validation.data;
+    const { period__gte, period__lte } = validation.data;
     const userId = await getUserIdFromRequest(request);
-    const reports = await reportService.listBalanceReports(userId, period__gte);
+    const reports = await reportService.listBalanceReports(
+      userId,
+      period__gte,
+      period__lte
+    );
     reply.code(StatusCodes.OK).send(reports);
   } catch (error) {
     handleErrorResponse(error, reply);
@@ -72,15 +90,22 @@ const listSummaryReports = async (request, reply) => {
     period__gte: z.string().refine((val) => !isNaN(Date.parse(val)), {
       message: "Data inválida",
     }),
+    period__lte: z.string().refine((val) => !isNaN(Date.parse(val)), {
+      message: "Data inválida",
+    }),
   });
 
   try {
     const validation = querySchema.safeParse(request.query);
     if (!validation.success) throw validation.error;
 
-    const { period__gte } = validation.data;
+    const { period__gte, period__lte } = validation.data;
     const userId = await getUserIdFromRequest(request);
-    const reports = await reportService.listSummaryReports(userId, period__gte);
+    const reports = await reportService.listSummaryReports(
+      userId,
+      period__gte,
+      period__lte
+    );
     reply.code(StatusCodes.OK).send(reports);
   } catch (error) {
     handleErrorResponse(error, reply);

@@ -7,14 +7,16 @@ import { ptBR } from "date-fns/locale";
 const capitalize = (str) =>
   str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
 
-const listMonthlyReports = async (userId, period__gte) => {
+const listMonthlyReports = async (userId, period__gte, period__lte) => {
   try {
-    const periodDate = new Date(period__gte);
+    const periodDateGte = new Date(period__gte);
+    const periodDateLte = new Date(period__lte);
     const transactions = await transactionRepository.listTransactions(
       userId,
       null,
       null,
-      periodDate,
+      periodDateGte,
+      periodDateLte,
       "desc",
       null,
       null
@@ -95,14 +97,16 @@ const listCategoriesReports = async (userId, period__gte) => {
   }
 };
 
-const listBalanceReports = async (userId, period__gte) => {
+const listBalanceReports = async (userId, period__gte, period__lte) => {
   try {
-    const periodDate = new Date(period__gte);
+    const periodDateGte = new Date(period__gte);
+    const periodDateLte = new Date(period__lte);
     const transactions = await transactionRepository.listTransactions(
       userId,
       null,
       null,
-      periodDate,
+      periodDateGte,
+      periodDateLte,
       "desc",
       null
     );
@@ -157,13 +161,14 @@ const listBalanceReports = async (userId, period__gte) => {
   }
 };
 
-const listSummaryReports = async (userId, period__gte) => {
+const listSummaryReports = async (userId, period__gte, period__lte) => {
   try {
     const transactions = await transactionRepository.listTransactions(
       userId,
       null,
       null,
       new Date(period__gte),
+      new Date(period__lte),
       "desc",
       null,
       null
