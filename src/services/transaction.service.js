@@ -11,7 +11,7 @@ const createTransaction = async (
   amount
 ) => {
   try {
-    const transaction = await transactionRepository.createTransaction(
+    return await transactionRepository.createTransaction(
       userId,
       type,
       description,
@@ -20,8 +20,6 @@ const createTransaction = async (
       account,
       amount
     );
-
-    return transaction;
   } catch (error) {
     throw new AppError(error.message);
   }
@@ -35,30 +33,25 @@ const listTransactions = async (
   date__lte,
   sort,
   search,
-  limit
+  page = 1,
+  perPage = 10
 ) => {
-  try {
-    const transactions = await transactionRepository.listTransactions(
-      userId,
-      type,
-      date,
-      date__gte,
-      date__lte,
-      sort,
-      search,
-      limit
-    );
-
-    return transactions;
-  } catch (error) {
-    throw new AppError(error.message);
-  }
+  return await transactionRepository.listTransactions(
+    userId,
+    type,
+    date,
+    date__gte,
+    date__lte,
+    sort,
+    search,
+    page,
+    perPage
+  );
 };
 
 const listTransactionById = async (id) => {
   try {
-    const transaction = await transactionRepository.listTransactionById(id);
-    return transaction;
+    return await transactionRepository.listTransactionById(id);
   } catch (error) {
     throw new AppError(error.message);
   }
@@ -66,8 +59,7 @@ const listTransactionById = async (id) => {
 
 const deleteTransaction = async (id) => {
   try {
-    const transaction = await transactionRepository.deleteTransaction(id);
-    return transaction;
+    return await transactionRepository.deleteTransaction(id);
   } catch (error) {
     throw new AppError(error.message);
   }
@@ -75,8 +67,7 @@ const deleteTransaction = async (id) => {
 
 const updateTransaction = async (id, data) => {
   try {
-    const transaction = await transactionRepository.updateTransaction(id, data);
-    return transaction;
+    return await transactionRepository.updateTransaction(id, data);
   } catch (error) {
     throw new AppError(error.message);
   }

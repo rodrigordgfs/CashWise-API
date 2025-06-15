@@ -11,7 +11,7 @@ const listMonthlyReports = async (userId, period__gte, period__lte) => {
   try {
     const periodDateGte = new Date(period__gte);
     const periodDateLte = new Date(period__lte);
-    const transactions = await transactionRepository.listTransactions(
+    const { transactions } = await transactionRepository.listTransactions(
       userId,
       null,
       null,
@@ -101,7 +101,7 @@ const listBalanceReports = async (userId, period__gte, period__lte) => {
   try {
     const periodDateGte = new Date(period__gte);
     const periodDateLte = new Date(period__lte);
-    const transactions = await transactionRepository.listTransactions(
+    const { transactions } = await transactionRepository.listTransactions(
       userId,
       null,
       null,
@@ -163,7 +163,7 @@ const listBalanceReports = async (userId, period__gte, period__lte) => {
 
 const listSummaryReports = async (userId, period__gte, period__lte) => {
   try {
-    const transactions = await transactionRepository.listTransactions(
+    const { transactions } = await transactionRepository.listTransactions(
       userId,
       null,
       null,

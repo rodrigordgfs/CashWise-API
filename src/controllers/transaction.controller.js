@@ -8,42 +8,24 @@ const createTransaction = async (request, reply) => {
   const userId = await getUserIdFromRequest(request);
 
   const transactionSchema = z.object({
-    type: z.enum(["INCOME", "EXPENSE"], {
-      required_error: "O tipo de transação é obrigatório",
-    }),
-    description: z.string().min(1, "A descrição é obrigatória"),
-    categoryId: z.string().min(1, "O ID da categoria é obrigatório"),
+    type: z.enum(["INCOME", "EXPENSE"]),
+    description: z.string().min(1),
+    categoryId: z.string().min(1),
     date: z
-      .string({ required_error: "A data é obrigatória" })
+      .string()
       .transform((str) => new Date(str))
-      .refine((date) => !isNaN(date.getTime()), {
-        message: "Data inválida",
-      })
-      .refine((date) => date >= new Date(0), {
-        message: "A data é obrigatória",
-      }),
-    account: z.string().min(1, "A conta é obrigatória"),
-    amount: z.number().min(0, "O valor deve ser positivo"),
+      .refine((date) => !isNaN(date.getTime())),
+    account: z.string().min(1),
+    amount: z.number().min(0),
   });
 
   try {
     const validation = transactionSchema.safeParse(request.body);
-
-    if (!validation.success) {
-      throw validation.error;
-    }
-
-    const { type, description, categoryId, date, account, amount } =
-      validation.data;
+    if (!validation.success) throw validation.error;
 
     const transaction = await transactionService.createTransaction(
       userId,
-      type,
-      description,
-      categoryId,
-      date,
-      account,
-      amount
+      ...Object.values(validation.data)
     );
 
     reply.code(StatusCodes.CREATED).send(transaction);
@@ -59,44 +41,51 @@ const listTransactions = async (request, reply) => {
     type: z.enum(["INCOME", "EXPENSE"]).optional(),
     date: z
       .string()
-      .refine((val) => !isNaN(Date.parse(val)), {
-        message: "Data inválida",
-      })
+      .refine((val) => !isNaN(Date.parse(val)))
       .optional(),
     date__gte: z
       .string()
-      .refine((val) => !isNaN(Date.parse(val)), {
-        message: "Data inválida",
-      })
+      .refine((val) => !isNaN(Date.parse(val)))
       .optional(),
     date__lte: z
       .string()
-      .refine((val) => !isNaN(Date.parse(val)), {
-        message: "Data inválida",
-      })
+      .refine((val) => !isNaN(Date.parse(val)))
       .optional(),
     sort: z.enum(["asc", "desc"]).optional(),
-    search: z.string().min(1).optional(),
-    limit: z
+    search: z.string().optional(),
+    page: z
       .string()
       .transform(Number)
-      .refine((val) => !isNaN(val), {
-        message: "O limite deve ser um número válido",
+      .refine((val) => val > 0, {
+        message: "Page precisa ser maior que 0",
+      })
+      .optional(),
+
+    perPage: z
+      .string()
+      .transform(Number)
+      .refine((val) => val > 0, {
+        message: "perPage precisa ser maior que 0",
       })
       .optional(),
   });
 
   try {
     const validation = querySchema.safeParse(request.query);
+    if (!validation.success) throw validation.error;
 
-    if (!validation.success) {
-      throw validation.error;
-    }
+    const {
+      type,
+      date,
+      date__gte,
+      date__lte,
+      sort,
+      search,
+      page = 1,
+      perPage = 10,
+    } = validation.data;
 
-    const { type, date, sort, search, limit, date__gte, date__lte } =
-      validation.data;
-
-    const transactions = await transactionService.listTransactions(
+    const { transactions, total } = await transactionService.listTransactions(
       userId,
       type,
       date,
@@ -104,32 +93,35 @@ const listTransactions = async (request, reply) => {
       date__lte,
       sort,
       search,
-      limit
+      page,
+      perPage
     );
 
-    reply.code(StatusCodes.OK).send(transactions);
+    const totalPages = Math.ceil(total / perPage);
+
+    reply
+      .header("x-total-count", total)
+      .header("x-current-page", page)
+      .header("x-per-page", perPage)
+      .header("x-total-pages", totalPages)
+      .code(StatusCodes.OK)
+      .send(transactions);
   } catch (error) {
     handleErrorResponse(error, reply);
   }
 };
 
 const listTransactionById = async (request, reply) => {
-  const paramsSchema = z.object({
-    id: z.string({ required_error: "O ID da transação é obrigatório" }),
-  });
+  const schema = z.object({ id: z.string() });
 
   try {
-    const validation = paramsSchema.safeParse(request.params);
-
-    if (!validation.success) {
-      throw validation.error;
-    }
+    const validation = schema.safeParse(request.params);
+    if (!validation.success) throw validation.error;
 
     const { id } = validation.data;
     const transaction = await transactionService.listTransactionById(id);
-    if (!transaction) {
-      throw new AppError("Transação não encontrada", StatusCodes.NOT_FOUND);
-    }
+
+    if (!transaction) throw new AppError("Transação não encontrada", 404);
 
     reply.code(StatusCodes.OK).send(transaction);
   } catch (error) {
@@ -138,24 +130,16 @@ const listTransactionById = async (request, reply) => {
 };
 
 const deleteTransaction = async (request, reply) => {
-  const paramsSchema = z.object({
-    id: z.string({ required_error: "O ID da transação é obrigatório" }),
-  });
+  const schema = z.object({ id: z.string() });
 
   try {
-    const validation = paramsSchema.safeParse(request.params);
-
-    if (!validation.success) {
-      throw validation.error;
-    }
+    const validation = schema.safeParse(request.params);
+    if (!validation.success) throw validation.error;
 
     const { id } = validation.data;
 
     const transaction = await transactionService.deleteTransaction(id);
-
-    if (!transaction) {
-      throw new AppError("Transação não encontrada", StatusCodes.NOT_FOUND);
-    }
+    if (!transaction) throw new AppError("Transação não encontrada", 404);
 
     reply
       .code(StatusCodes.OK)
@@ -166,26 +150,18 @@ const deleteTransaction = async (request, reply) => {
 };
 
 const updateTransaction = async (request, reply) => {
-  const paramsSchema = z.object({
-    id: z.string({ required_error: "O ID da transação é obrigatório" }),
-  });
-
+  const paramsSchema = z.object({ id: z.string() });
   const bodySchema = z.object({
     type: z.enum(["INCOME", "EXPENSE"]).optional(),
-    description: z.string().min(1, "A descrição é obrigatória").optional(),
-    categoryId: z.string().min(1, "O ID da categoria é obrigatório").optional(),
+    description: z.string().min(1).optional(),
+    categoryId: z.string().min(1).optional(),
     date: z
-      .string({ required_error: "A data é obrigatória" })
+      .string()
       .transform((str) => new Date(str))
-      .refine((date) => !isNaN(date.getTime()), {
-        message: "Data inválida",
-      })
-      .refine((date) => date >= new Date(0), {
-        message: "A data é obrigatória",
-      })
+      .refine((date) => !isNaN(date.getTime()))
       .optional(),
-    account: z.string().min(1, "A conta é obrigatória").optional(),
-    amount: z.number().min(0, "O valor deve ser positivo").optional(),
+    account: z.string().min(1).optional(),
+    amount: z.number().min(0).optional(),
   });
 
   try {
@@ -200,13 +176,12 @@ const updateTransaction = async (request, reply) => {
     }
 
     const { id } = paramsValidation.data;
-    const data = bodyValidation.data;
+    const transaction = await transactionService.updateTransaction(
+      id,
+      bodyValidation.data
+    );
 
-    const transaction = await transactionService.updateTransaction(id, data);
-
-    if (!transaction) {
-      throw new AppError("Transação não encontrada", StatusCodes.NOT_FOUND);
-    }
+    if (!transaction) throw new AppError("Transação não encontrada", 404);
 
     reply.code(StatusCodes.OK).send(transaction);
   } catch (error) {

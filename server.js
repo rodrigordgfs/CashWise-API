@@ -32,6 +32,12 @@ app.register(cors, {
   methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
   allowedHeaders: "*",
   credentials: true,
+  exposedHeaders: [
+    "x-total-count",
+    "x-current-page",
+    "x-per-page",
+    "x-total-pages",
+  ],
 });
 
 app.register(clerkPlugin, {
