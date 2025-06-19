@@ -3,6 +3,7 @@ import { StatusCodes } from "http-status-codes";
 import reportService from "../services/report.service.js";
 import { handleErrorResponse } from "../utils/error.js";
 import { getUserIdFromRequest } from "../utils/getUserId.js";
+import { parseISO } from "date-fns";
 
 const listMonthlyReports = async (request, reply) => {
   const querySchema = z.object({
@@ -100,11 +101,13 @@ const listSummaryReports = async (request, reply) => {
     if (!validation.success) throw validation.error;
 
     const { period__gte, period__lte } = validation.data;
+    const periodGte = parseISO(period__gte);
+    const periodLte = parseISO(period__lte);
     const userId = await getUserIdFromRequest(request);
     const reports = await reportService.listSummaryReports(
       userId,
-      period__gte,
-      period__lte
+      periodGte,
+      periodLte
     );
     reply.code(StatusCodes.OK).send(reports);
   } catch (error) {
