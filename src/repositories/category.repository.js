@@ -37,11 +37,25 @@ const listCategories = async (userId, type) => {
   }
 };
 
-const listCategoriesWithTransactions = async (userId) => {
+const listCategoriesWithTransactions = async (userId, limit, dateTransactionGte, dateTransactionLte) => {
   try {
     const categories = await prisma.category.findMany({
       where: {
         ...(userId && { userId }),
+        Transaction: {
+          some: {
+            date: {
+              ...(dateTransactionGte && { gte: new Date(dateTransactionGte) }),
+              ...(dateTransactionLte && { lte: new Date(dateTransactionLte) }),
+            }
+          }
+        },
+      },
+      take: limit || undefined,
+      orderBy: {
+        Transaction: {
+          _count: "desc",
+        },
       },
       include: {
         Transaction: true,

@@ -41,10 +41,10 @@ const listTransactions = async (
   sort,
   search,
   page = 1,
-  perPage = 10
+  perPage
 ) => {
   try {
-    const skip = Math.max(0, (page - 1) * perPage);
+    const skip = perPage ? Math.max(0, (page - 1) * perPage) : undefined;
 
     const where = {
       ...(userId && { userId }),
@@ -70,7 +70,7 @@ const listTransactions = async (
         where,
         orderBy: { date: sort === "desc" ? "desc" : "asc" },
         skip,
-        take: perPage,
+        take: perPage || undefined,
         select: {
           id: true,
           userId: true,

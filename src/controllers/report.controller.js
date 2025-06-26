@@ -40,18 +40,26 @@ const listCategoriesWithTransactions = async (request, reply) => {
     period__lte: z.string().refine((val) => !isNaN(Date.parse(val)), {
       message: "Data inválida",
     }),
+    limit: z
+      .number()
+      .optional()
+      .default(5)
+      .refine((val) => val > 0, {
+        message: "O limite deve ser um número positivo",
+      }),
   });
 
   try {
     const validation = querySchema.safeParse(request.query);
     if (!validation.success) throw validation.error;
 
-    const { period__gte, period__lte } = validation.data;
+    const { period__gte, period__lte, limit } = validation.data;
     const userId = await getUserIdFromRequest(request);
     const categories = await reportService.listCategoriesReports(
       userId,
       period__gte,
-      period__lte
+      period__lte,
+      limit
     );
     reply.code(StatusCodes.OK).send(categories);
   } catch (error) {
