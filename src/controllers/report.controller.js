@@ -41,10 +41,10 @@ const listCategoriesWithTransactions = async (request, reply) => {
       message: "Data inválida",
     }),
     limit: z
-      .number()
+      .string()
       .optional()
-      .default(5)
-      .refine((val) => val > 0, {
+      .transform((val) => (val !== undefined ? Number(val) : undefined))
+      .refine((val) => val === undefined || (!isNaN(val) && val > 0), {
         message: "O limite deve ser um número positivo",
       }),
   });
