@@ -100,6 +100,19 @@ const listTransactions = async (
   }
 };
 
+const listByCategory = async (categoryId) => {
+  try {
+    return await prisma.transaction.findMany({
+      where: { categoryId },
+      orderBy: { date: "desc" },
+      include: { category: true },
+    });
+  } catch (error) {
+    logError(error);
+  }
+};
+
+
 const listTransactionById = async (id) => {
   try {
     return await prisma.transaction.findUnique({
@@ -133,4 +146,5 @@ export default {
   listTransactionById,
   deleteTransaction,
   updateTransaction,
+  listByCategory
 };
