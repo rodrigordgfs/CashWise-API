@@ -101,6 +101,17 @@ const updateCategory = async (id, data) => {
   }
 };
 
+const existTransactionsInCategory = async (id) => {
+  try {
+    const count = await prisma.transaction.count({
+      where: { categoryId: id },
+    });
+    return count > 0;
+  } catch (error) {
+    logError(error);
+  }
+}
+
 export default {
   createCategory,
   listCategories,
@@ -108,4 +119,5 @@ export default {
   listCategoriesWithTransactions,
   deleteCategory,
   updateCategory,
+  existTransactionsInCategory
 };

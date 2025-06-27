@@ -37,6 +37,12 @@ const listCategoryById = async (id) => {
 
 const deleteCategory = async (id) => {
   try {
+    const existTransactionsInCategory = await categoryRepository.existTransactionsInCategory(id);
+
+    if (existTransactionsInCategory) {
+      throw new AppError("Não é possível excluir uma categoria que possui transações associadas.");
+    }
+
     const category = await categoryRepository.deleteCategory(id);
     return category;
   } catch (error) {
