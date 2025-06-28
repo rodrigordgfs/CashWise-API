@@ -2,6 +2,7 @@ import transactionController from "../controllers/transaction.controller.js";
 
 const transactionRoute = (fastify) => {
   fastify.post("/transaction", transactionController.createTransaction);
+  fastify.post("/transaction/import-ofx", transactionController.createTransactionsFromOfx);
   fastify.get("/transaction", transactionController.listTransactions);
   fastify.get("/transaction/:id", transactionController.listTransactionById);
   fastify.delete("/transaction/:id", transactionController.deleteTransaction);

@@ -34,6 +34,40 @@ const createTransaction = async (request, reply) => {
   }
 };
 
+const createTransactionsFromOfx = async (request, reply) => {
+  const userId = await getUserIdFromRequest(request);
+
+  const transactionsOfxSchema = z.array(
+    z.object({
+      description: z.string().min(1),
+      date: z
+        .string()
+        .transform((str) => new Date(str))
+        .refine((date) => !isNaN(date.getTime())),
+      amount: z
+        .string()
+        .transform((val) => parseFloat(val))
+        .refine((num) => !isNaN(num) && num >= 0, {
+          message: "Valor inválido",
+        }),
+      type: z.enum(["INCOME", "EXPENSE"]),
+    })
+  );
+  try {
+    const validation = transactionsOfxSchema.safeParse(request.body);
+    if (!validation.success) throw validation.error;
+
+    const transactions = await transactionService.createTransactionsFromOfx(
+      userId,
+      validation.data
+    );
+
+    reply.code(StatusCodes.CREATED).send(transactions);
+  } catch (error) {
+    handleErrorResponse(error, reply);
+  }
+};
+
 const listTransactions = async (request, reply) => {
   const userId = await getUserIdFromRequest(request);
 
@@ -191,6 +225,7 @@ const updateTransaction = async (request, reply) => {
 
 export default {
   createTransaction,
+  createTransactionsFromOfx,
   listTransactions,
   listTransactionById,
   deleteTransaction,

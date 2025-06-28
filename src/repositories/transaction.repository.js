@@ -32,6 +32,24 @@ const createTransaction = async (
   }
 };
 
+const createTransactionsFromOfx = async (userId, transactions) => {
+  try {
+    const formattedTransactions = transactions.map((transaction) => ({
+      userId,
+      type: transaction.type,
+      description: transaction.description,
+      date: transaction.date,
+      amount: transaction.amount,
+    }));
+
+    return await prisma.transaction.createMany({
+      data: formattedTransactions,
+    });
+  } catch (error) {
+    logError(error);
+  }
+}
+
 const listTransactions = async (
   userId,
   type,
@@ -142,6 +160,7 @@ const updateTransaction = async (id, data) => {
 
 export default {
   createTransaction,
+  createTransactionsFromOfx,
   listTransactions,
   listTransactionById,
   deleteTransaction,

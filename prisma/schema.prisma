@@ -36,12 +36,12 @@ model Transaction {
   userId      String
   type        CategoryType
   description String
-  categoryId  String
+  categoryId  String?
   date        DateTime
-  account     String
+  account     String?
   amount      Float
   paid        Boolean      @default(false)
-  category    Category     @relation(fields: [categoryId], references: [id])
+  category    Category?    @relation(fields: [categoryId], references: [id])
   createdAt   DateTime     @default(now())
   updatedAt   DateTime     @updatedAt
 

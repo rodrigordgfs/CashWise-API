@@ -25,6 +25,17 @@ const createTransaction = async (
   }
 };
 
+const createTransactionsFromOfx = async (userId, transactions) => {
+  try {
+    return await transactionRepository.createTransactionsFromOfx(
+      userId,
+      transactions
+    );
+  } catch (error) {
+    throw new AppError(error.message);
+  }
+};
+
 const listTransactions = async (
   userId,
   type,
@@ -75,6 +86,7 @@ const updateTransaction = async (id, data) => {
 
 export default {
   createTransaction,
+  createTransactionsFromOfx,
   listTransactions,
   listTransactionById,
   deleteTransaction,
