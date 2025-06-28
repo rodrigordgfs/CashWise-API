@@ -23,21 +23,36 @@ const createCategory = async (userId, name, type, color, icon) => {
   }
 };
 
-const listCategories = async (userId, type) => {
+const listCategories = async (userId, type, page = 1, perPage = 10) => {
   try {
-    const categories = await prisma.category.findMany({
-      where: {
-        ...(userId && { userId }),
-        ...(type && { type }),
-      },
-    });
-    return categories;
+    const skip = perPage ? Math.max(0, (page - 1) * perPage) : undefined;
+
+    const where = {
+      ...(userId && { userId }),
+      ...(type && { type }),
+    };
+
+    const [categories, total] = await Promise.all([
+      prisma.category.findMany({
+        where,
+        skip,
+        take: perPage || undefined,
+      }),
+      prisma.category.count({ where }),
+    ]);
+
+    return { categories, total };
   } catch (error) {
     logError(error);
   }
 };
 
-const listCategoriesWithTransactions = async (userId, limit, dateTransactionGte, dateTransactionLte) => {
+const listCategoriesWithTransactions = async (
+  userId,
+  limit,
+  dateTransactionGte,
+  dateTransactionLte
+) => {
   try {
     const categories = await prisma.category.findMany({
       where: {
@@ -47,8 +62,8 @@ const listCategoriesWithTransactions = async (userId, limit, dateTransactionGte,
             date: {
               ...(dateTransactionGte && { gte: new Date(dateTransactionGte) }),
               ...(dateTransactionLte && { lte: new Date(dateTransactionLte) }),
-            }
-          }
+            },
+          },
         },
       },
       take: limit || undefined,
@@ -110,7 +125,7 @@ const existTransactionsInCategory = async (id) => {
   } catch (error) {
     logError(error);
   }
-}
+};
 
 export default {
   createCategory,
@@ -119,5 +134,5 @@ export default {
   listCategoriesWithTransactions,
   deleteCategory,
   updateCategory,
-  existTransactionsInCategory
+  existTransactionsInCategory,
 };

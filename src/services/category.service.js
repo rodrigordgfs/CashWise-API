@@ -17,10 +17,9 @@ const createCategory = async (userId, name, type, color, icon) => {
   }
 };
 
-const listCategories = async (userId, type) => {
+const listCategories = async (userId, type, page = 1, perPage = 10) => {
   try {
-    const categories = await categoryRepository.listCategories(userId, type);
-    return categories;
+    return await categoryRepository.listCategories(userId, type, page, perPage);
   } catch (error) {
     throw new AppError(error.message);
   }
@@ -37,10 +36,13 @@ const listCategoryById = async (id) => {
 
 const deleteCategory = async (id) => {
   try {
-    const existTransactionsInCategory = await categoryRepository.existTransactionsInCategory(id);
+    const existTransactionsInCategory =
+      await categoryRepository.existTransactionsInCategory(id);
 
     if (existTransactionsInCategory) {
-      throw new AppError("Não é possível excluir uma categoria que possui transações associadas.");
+      throw new AppError(
+        "Não é possível excluir uma categoria que possui transações associadas."
+      );
     }
 
     const category = await categoryRepository.deleteCategory(id);

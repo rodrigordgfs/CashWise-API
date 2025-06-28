@@ -48,20 +48,43 @@ const listCategories = async (request, reply) => {
 
   const querySchema = z.object({
     type: z.enum(["INCOME", "EXPENSE"]).optional(),
+    page: z
+      .string()
+      .transform(Number)
+      .refine((val) => val > 0, {
+        message: "Page precisa ser maior que 0",
+      })
+      .optional(),
+    perPage: z
+      .string()
+      .transform(Number)
+      .refine((val) => val > 0, {
+        message: "perPage precisa ser maior que 0",
+      })
+      .optional(),
   });
 
   try {
     const validation = querySchema.safeParse(request.query);
+    if (!validation.success) throw validation.error;
 
-    if (!validation.success) {
-      throw validation.error;
-    }
+    const { type, page = 1, perPage = 10 } = validation.data;
+    const { categories, total } = await categoryService.listCategories(
+      userId,
+      type,
+      page,
+      perPage
+    );
 
-    const { type } = validation.data;
+    const totalPages = Math.ceil(total / perPage);
 
-    const categories = await categoryService.listCategories(userId, type);
-
-    reply.code(StatusCodes.OK).send(categories);
+    reply
+      .header("x-total-count", total)
+      .header("x-current-page", page)
+      .header("x-per-page", perPage)
+      .header("x-total-pages", totalPages)
+      .code(StatusCodes.OK)
+      .send(categories);
   } catch (error) {
     handleErrorResponse(error, reply);
   }
