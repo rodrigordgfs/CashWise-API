@@ -1,76 +1,28 @@
-import { z } from "zod";
 import { StatusCodes } from "http-status-codes";
-import categoryService from "../services/category.service.js";
 import AppError, { handleErrorResponse } from "../utils/error.js";
-import { getUserIdFromRequest } from "../utils/getUserId.js";
+import categoryService from "../services/category.service.js";
 
-const createCategory = async (request, reply) => {
-  const userId = await getUserIdFromRequest(request);
-
-  const categorySchema = z.object({
-    name: z.string({ required_error: "O nome da categoria é obrigatório" }),
-    type: z.enum(["INCOME", "EXPENSE"], {
-      required_error: "O tipo de categoria é obrigatório",
-    }),
-    color: z
-      .string({ required_error: "A cor é obrigatória" })
-      .min(1, "A cor não pode estar vazia"),
-    icon: z
-      .string({ required_error: "O ícone é obrigatório" })
-      .min(1, "O ícone não pode estar vazio"),
-  });
-
+const createCategory = async (req, reply) => {
   try {
-    const validation = categorySchema.safeParse(request.body);
-
-    if (!validation.success) {
-      throw validation.error;
-    }
-
-    const { name, type, color, icon } = validation.data;
-
+    const { name, type, color, icon } = req.body;
     const category = await categoryService.createCategory(
-      userId,
+      req.userId,
       name,
       type,
       color,
       icon
     );
-
     reply.code(StatusCodes.CREATED).send(category);
   } catch (error) {
     handleErrorResponse(error, reply);
   }
 };
 
-const listCategories = async (request, reply) => {
-  const userId = await getUserIdFromRequest(request);
-
-  const querySchema = z.object({
-    type: z.enum(["INCOME", "EXPENSE"]).optional(),
-    page: z
-      .string()
-      .transform(Number)
-      .refine((val) => val > 0, {
-        message: "Page precisa ser maior que 0",
-      })
-      .optional(),
-    perPage: z
-      .string()
-      .transform(Number)
-      .refine((val) => val > 0, {
-        message: "perPage precisa ser maior que 0",
-      })
-      .optional(),
-  });
-
+const listCategories = async (req, reply) => {
   try {
-    const validation = querySchema.safeParse(request.query);
-    if (!validation.success) throw validation.error;
-
-    const { type, page = 1, perPage = 10 } = validation.data;
+    const { type, page = 1, perPage = 10 } = req.query;
     const { categories, total } = await categoryService.listCategories(
-      userId,
+      req.userId,
       type,
       page,
       perPage
@@ -90,21 +42,9 @@ const listCategories = async (request, reply) => {
   }
 };
 
-const listCategoryById = async (request, reply) => {
-  const paramsSchema = z.object({
-    id: z.string({ required_error: "O ID da categoria é obrigatório" }),
-  });
-
+const listCategoryById = async (req, reply) => {
   try {
-    const validation = paramsSchema.safeParse(request.params);
-
-    if (!validation.success) {
-      throw validation.error;
-    }
-
-    const { id } = validation.data;
-
-    const category = await categoryService.listCategoryById(id);
+    const category = await categoryService.listCategoryById(req.params.id);
 
     if (!category) {
       throw new AppError("Categoria não encontrada", StatusCodes.NOT_FOUND);
@@ -116,23 +56,11 @@ const listCategoryById = async (request, reply) => {
   }
 };
 
-const deleteCategory = async (request, reply) => {
-  const paramsSchema = z.object({
-    id: z.string({ required_error: "O ID da categoria é obrigatório" }),
-  });
-
+const deleteCategory = async (req, reply) => {
   try {
-    const validation = paramsSchema.safeParse(request.params);
+    const deleted = await categoryService.deleteCategory(req.params.id);
 
-    if (!validation.success) {
-      throw validation.error;
-    }
-
-    const { id } = validation.data;
-
-    const category = await categoryService.deleteCategory(id);
-
-    if (!category) {
+    if (!deleted) {
       throw new AppError("Categoria não encontrada", StatusCodes.NOT_FOUND);
     }
 
@@ -144,33 +72,12 @@ const deleteCategory = async (request, reply) => {
   }
 };
 
-const updateCategory = async (request, reply) => {
-  const paramsSchema = z.object({
-    id: z.string({ required_error: "O ID da categoria é obrigatório" }),
-  });
-
-  const bodySchema = z.object({
-    name: z.string().optional(),
-    type: z.enum(["INCOME", "EXPENSE"]).optional(),
-    color: z.string().optional(),
-    icon: z.string().optional(),
-  });
-
+const updateCategory = async (req, reply) => {
   try {
-    const paramsValidation = paramsSchema.safeParse(request.params);
-    const bodyValidation = bodySchema.safeParse(request.body);
-
-    if (!paramsValidation.success || !bodyValidation.success) {
-      throw new z.ZodError([
-        ...paramsValidation.error.errors,
-        ...bodyValidation.error.errors,
-      ]);
-    }
-
-    const { id } = paramsValidation.data;
-    const data = bodyValidation.data;
-
-    const category = await categoryService.updateCategory(id, data);
+    const category = await categoryService.updateCategory(
+      req.params.id,
+      req.body
+    );
 
     if (!category) {
       throw new AppError("Categoria não encontrada", StatusCodes.NOT_FOUND);
