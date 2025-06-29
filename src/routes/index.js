@@ -10,8 +10,8 @@ const routes = async (fastify) => {
   if (enviroment.env !== "development") {
     fastify.addHook("preHandler", clerkAuth);
   }
-  fastify.register(goalRoute);
-  fastify.register(categoryRoute);
+  await fastify.register(goalRoute);
+  await fastify.register(categoryRoute);
   await fastify.register(transactionRoute);
   await fastify.register(budgetRoute);
   fastify.register(reportRoute);
