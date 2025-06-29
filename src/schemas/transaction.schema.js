@@ -40,8 +40,8 @@ export const querySchema = z.object({
   date__lte: z.string().refine((val) => !isNaN(Date.parse(val))).optional(),
   sort: z.enum(["asc", "desc"]).optional(),
   search: z.string().optional(),
-  page: z.string().transform(Number).refine((v) => v > 0).optional(),
-  perPage: z.string().transform(Number).refine((v) => v > 0).optional(),
+  page: z.coerce.number().int().min(1).optional(),
+  perPage: z.coerce.number().int().min(1).optional(),
 });
 
 export const idParamSchema = z.object({ id: z.string() });

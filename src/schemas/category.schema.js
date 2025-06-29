@@ -21,18 +21,6 @@ export const idParamSchema = z.object({
 
 export const categoryQuerySchema = z.object({
   type: z.enum(["INCOME", "EXPENSE"]).optional(),
-  page: z
-    .string()
-    .transform(Number)
-    .refine((val) => val > 0, {
-      message: "Page precisa ser maior que 0",
-    })
-    .optional(),
-  perPage: z
-    .string()
-    .transform(Number)
-    .refine((val) => val > 0, {
-      message: "perPage precisa ser maior que 0",
-    })
-    .optional(),
+  page: z.coerce.number().int().min(1).optional(),
+  perPage: z.coerce.number().int().min(1).optional(),
 });

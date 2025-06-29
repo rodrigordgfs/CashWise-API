@@ -10,11 +10,5 @@ export const basePeriodSchema = z.object({
 });
 
 export const reportWithLimitSchema = basePeriodSchema.extend({
-  limit: z
-    .string()
-    .optional()
-    .transform((val) => (val !== undefined ? Number(val) : undefined))
-    .refine((val) => val === undefined || (!isNaN(val) && val > 0), {
-      message: "O limite deve ser um número positivo",
-    }),
+  limit: z.coerce.number().int().min(1).optional(),
 });
