@@ -22,20 +22,117 @@ export default async function transactionRoute(fastify) {
         summary: 'Criar nova transação',
         description: 'Cria uma nova transação financeira para o usuário autenticado',
         body: {
-          $ref: '#/components/schemas/CreateTransaction'
+          type: 'object',
+          required: ['type', 'description', 'categoryId', 'date', 'account', 'amount'],
+          properties: {
+            type: {
+              type: 'string',
+              enum: ['INCOME', 'EXPENSE'],
+              description: 'Tipo da transação'
+            },
+            description: {
+              type: 'string',
+              description: 'Descrição da transação'
+            },
+            categoryId: {
+              type: 'string',
+              format: 'uuid',
+              description: 'ID da categoria associada'
+            },
+            date: {
+              type: 'string',
+              format: 'date-time',
+              description: 'Data da transação'
+            },
+            account: {
+              type: 'string',
+              description: 'Conta utilizada na transação'
+            },
+            amount: {
+              type: 'number',
+              format: 'float',
+              minimum: 0,
+              description: 'Valor da transação'
+            }
+          }
         },
         response: {
           201: {
             description: 'Transação criada com sucesso',
-            $ref: '#/components/schemas/Transaction'
+            type: 'object',
+            properties: {
+              id: {
+                type: 'string',
+                format: 'uuid',
+                description: 'ID único da transação'
+              },
+              userId: {
+                type: 'string',
+                description: 'ID do usuário proprietário'
+              },
+              type: {
+                type: 'string',
+                enum: ['INCOME', 'EXPENSE'],
+                description: 'Tipo da transação'
+              },
+              description: {
+                type: 'string',
+                description: 'Descrição da transação'
+              },
+              categoryId: {
+                type: 'string',
+                format: 'uuid',
+                description: 'ID da categoria associada'
+              },
+              date: {
+                type: 'string',
+                format: 'date-time',
+                description: 'Data da transação'
+              },
+              account: {
+                type: 'string',
+                description: 'Conta utilizada na transação'
+              },
+              amount: {
+                type: 'number',
+                format: 'float',
+                description: 'Valor da transação'
+              },
+              paid: {
+                type: 'boolean',
+                description: 'Status de pagamento'
+              },
+              createdAt: {
+                type: 'string',
+                format: 'date-time',
+                description: 'Data de criação'
+              },
+              updatedAt: {
+                type: 'string',
+                format: 'date-time',
+                description: 'Data da última atualização'
+              }
+            }
           },
           400: {
             description: 'Erro de validação',
-            $ref: '#/components/schemas/Error'
+            type: 'object',
+            properties: {
+              message: {
+                type: 'string',
+                description: 'Mensagem de erro'
+              }
+            }
           },
           401: {
             description: 'Não autorizado',
-            $ref: '#/components/schemas/Error'
+            type: 'object',
+            properties: {
+              message: {
+                type: 'string',
+                description: 'Mensagem de erro'
+              }
+            }
           }
         }
       }
@@ -91,11 +188,23 @@ export default async function transactionRoute(fastify) {
           },
           400: {
             description: 'Erro de validação',
-            $ref: '#/components/schemas/Error'
+            type: 'object',
+            properties: {
+              message: {
+                type: 'string',
+                description: 'Mensagem de erro'
+              }
+            }
           },
           401: {
             description: 'Não autorizado',
-            $ref: '#/components/schemas/Error'
+            type: 'object',
+            properties: {
+              message: {
+                type: 'string',
+                description: 'Mensagem de erro'
+              }
+            }
           }
         }
       }
@@ -163,7 +272,60 @@ export default async function transactionRoute(fastify) {
             description: 'Lista de transações',
             type: 'array',
             items: {
-              $ref: '#/components/schemas/Transaction'
+              type: 'object',
+              properties: {
+                id: {
+                  type: 'string',
+                  format: 'uuid',
+                  description: 'ID único da transação'
+                },
+                userId: {
+                  type: 'string',
+                  description: 'ID do usuário proprietário'
+                },
+                type: {
+                  type: 'string',
+                  enum: ['INCOME', 'EXPENSE'],
+                  description: 'Tipo da transação'
+                },
+                description: {
+                  type: 'string',
+                  description: 'Descrição da transação'
+                },
+                categoryId: {
+                  type: 'string',
+                  format: 'uuid',
+                  description: 'ID da categoria associada'
+                },
+                date: {
+                  type: 'string',
+                  format: 'date-time',
+                  description: 'Data da transação'
+                },
+                account: {
+                  type: 'string',
+                  description: 'Conta utilizada na transação'
+                },
+                amount: {
+                  type: 'number',
+                  format: 'float',
+                  description: 'Valor da transação'
+                },
+                paid: {
+                  type: 'boolean',
+                  description: 'Status de pagamento'
+                },
+                createdAt: {
+                  type: 'string',
+                  format: 'date-time',
+                  description: 'Data de criação'
+                },
+                updatedAt: {
+                  type: 'string',
+                  format: 'date-time',
+                  description: 'Data da última atualização'
+                }
+              }
             },
             headers: {
               'x-total-count': {
@@ -186,7 +348,13 @@ export default async function transactionRoute(fastify) {
           },
           401: {
             description: 'Não autorizado',
-            $ref: '#/components/schemas/Error'
+            type: 'object',
+            properties: {
+              message: {
+                type: 'string',
+                description: 'Mensagem de erro'
+              }
+            }
           }
         }
       }
@@ -216,15 +384,80 @@ export default async function transactionRoute(fastify) {
         response: {
           200: {
             description: 'Transação encontrada',
-            $ref: '#/components/schemas/Transaction'
+            type: 'object',
+            properties: {
+              id: {
+                type: 'string',
+                format: 'uuid',
+                description: 'ID único da transação'
+              },
+              userId: {
+                type: 'string',
+                description: 'ID do usuário proprietário'
+              },
+              type: {
+                type: 'string',
+                enum: ['INCOME', 'EXPENSE'],
+                description: 'Tipo da transação'
+              },
+              description: {
+                type: 'string',
+                description: 'Descrição da transação'
+              },
+              categoryId: {
+                type: 'string',
+                format: 'uuid',
+                description: 'ID da categoria associada'
+              },
+              date: {
+                type: 'string',
+                format: 'date-time',
+                description: 'Data da transação'
+              },
+              account: {
+                type: 'string',
+                description: 'Conta utilizada na transação'
+              },
+              amount: {
+                type: 'number',
+                format: 'float',
+                description: 'Valor da transação'
+              },
+              paid: {
+                type: 'boolean',
+                description: 'Status de pagamento'
+              },
+              createdAt: {
+                type: 'string',
+                format: 'date-time',
+                description: 'Data de criação'
+              },
+              updatedAt: {
+                type: 'string',
+                format: 'date-time',
+                description: 'Data da última atualização'
+              }
+            }
           },
           404: {
             description: 'Transação não encontrada',
-            $ref: '#/components/schemas/Error'
+            type: 'object',
+            properties: {
+              message: {
+                type: 'string',
+                description: 'Mensagem de erro'
+              }
+            }
           },
           401: {
             description: 'Não autorizado',
-            $ref: '#/components/schemas/Error'
+            type: 'object',
+            properties: {
+              message: {
+                type: 'string',
+                description: 'Mensagem de erro'
+              }
+            }
           }
         }
       }
@@ -254,15 +487,33 @@ export default async function transactionRoute(fastify) {
         response: {
           200: {
             description: 'Transação deletada com sucesso',
-            $ref: '#/components/schemas/SuccessMessage'
+            type: 'object',
+            properties: {
+              message: {
+                type: 'string',
+                description: 'Mensagem de sucesso'
+              }
+            }
           },
           404: {
             description: 'Transação não encontrada',
-            $ref: '#/components/schemas/Error'
+            type: 'object',
+            properties: {
+              message: {
+                type: 'string',
+                description: 'Mensagem de erro'
+              }
+            }
           },
           401: {
             description: 'Não autorizado',
-            $ref: '#/components/schemas/Error'
+            type: 'object',
+            properties: {
+              message: {
+                type: 'string',
+                description: 'Mensagem de erro'
+              }
+            }
           }
         }
       }
@@ -326,19 +577,90 @@ export default async function transactionRoute(fastify) {
         response: {
           200: {
             description: 'Transação atualizada com sucesso',
-            $ref: '#/components/schemas/Transaction'
+            type: 'object',
+            properties: {
+              id: {
+                type: 'string',
+                format: 'uuid',
+                description: 'ID único da transação'
+              },
+              userId: {
+                type: 'string',
+                description: 'ID do usuário proprietário'
+              },
+              type: {
+                type: 'string',
+                enum: ['INCOME', 'EXPENSE'],
+                description: 'Tipo da transação'
+              },
+              description: {
+                type: 'string',
+                description: 'Descrição da transação'
+              },
+              categoryId: {
+                type: 'string',
+                format: 'uuid',
+                description: 'ID da categoria associada'
+              },
+              date: {
+                type: 'string',
+                format: 'date-time',
+                description: 'Data da transação'
+              },
+              account: {
+                type: 'string',
+                description: 'Conta utilizada na transação'
+              },
+              amount: {
+                type: 'number',
+                format: 'float',
+                description: 'Valor da transação'
+              },
+              paid: {
+                type: 'boolean',
+                description: 'Status de pagamento'
+              },
+              createdAt: {
+                type: 'string',
+                format: 'date-time',
+                description: 'Data de criação'
+              },
+              updatedAt: {
+                type: 'string',
+                format: 'date-time',
+                description: 'Data da última atualização'
+              }
+            }
           },
           400: {
             description: 'Erro de validação',
-            $ref: '#/components/schemas/Error'
+            type: 'object',
+            properties: {
+              message: {
+                type: 'string',
+                description: 'Mensagem de erro'
+              }
+            }
           },
           404: {
             description: 'Transação não encontrada',
-            $ref: '#/components/schemas/Error'
+            type: 'object',
+            properties: {
+              message: {
+                type: 'string',
+                description: 'Mensagem de erro'
+              }
+            }
           },
           401: {
             description: 'Não autorizado',
-            $ref: '#/components/schemas/Error'
+            type: 'object',
+            properties: {
+              message: {
+                type: 'string',
+                description: 'Mensagem de erro'
+              }
+            }
           }
         }
       }

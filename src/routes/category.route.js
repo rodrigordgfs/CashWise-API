@@ -21,21 +21,42 @@ export default async function categoryRoutes(fastify) {
         summary: 'Criar nova categoria',
         description: 'Cria uma nova categoria de transação para o usuário autenticado',
         body: {
-          $ref: '#/components/schemas/CreateCategory'
+          type: 'object',
+          required: ['name', 'type', 'color', 'icon'],
+          properties: {
+            name: {
+              type: 'string',
+              description: 'Nome da categoria'
+            },
+            type: {
+              type: 'string',
+              enum: ['INCOME', 'EXPENSE'],
+              description: 'Tipo da categoria'
+            },
+            color: {
+              type: 'string',
+              description: 'Cor da categoria em hexadecimal'
+            },
+            icon: {
+              type: 'string',
+              description: 'Ícone da categoria'
+            }
+          }
         },
         response: {
           201: {
             description: 'Categoria criada com sucesso',
             type: 'object',
-            $ref: '#/components/schemas/Category'
-          },
-          400: {
-            description: 'Erro de validação',
-            $ref: '#/components/schemas/Error'
-          },
-          401: {
-            description: 'Não autorizado',
-            $ref: '#/components/schemas/Error'
+            properties: {
+              id: { type: 'string', format: 'uuid' },
+              userId: { type: 'string' },
+              name: { type: 'string' },
+              type: { type: 'string', enum: ['INCOME', 'EXPENSE'] },
+              color: { type: 'string' },
+              icon: { type: 'string' },
+              createdAt: { type: 'string', format: 'date-time' },
+              updatedAt: { type: 'string', format: 'date-time' }
+            }
           }
         }
       }
@@ -78,30 +99,18 @@ export default async function categoryRoutes(fastify) {
             description: 'Lista de categorias',
             type: 'array',
             items: {
-              $ref: '#/components/schemas/Category'
-            },
-            headers: {
-              'x-total-count': {
-                type: 'integer',
-                description: 'Total de registros'
-              },
-              'x-current-page': {
-                type: 'integer',
-                description: 'Página atual'
-              },
-              'x-per-page': {
-                type: 'integer',
-                description: 'Registros por página'
-              },
-              'x-total-pages': {
-                type: 'integer',
-                description: 'Total de páginas'
+              type: 'object',
+              properties: {
+                id: { type: 'string', format: 'uuid' },
+                userId: { type: 'string' },
+                name: { type: 'string' },
+                type: { type: 'string', enum: ['INCOME', 'EXPENSE'] },
+                color: { type: 'string' },
+                icon: { type: 'string' },
+                createdAt: { type: 'string', format: 'date-time' },
+                updatedAt: { type: 'string', format: 'date-time' }
               }
             }
-          },
-          401: {
-            description: 'Não autorizado',
-            $ref: '#/components/schemas/Error'
           }
         }
       }
@@ -131,15 +140,17 @@ export default async function categoryRoutes(fastify) {
         response: {
           200: {
             description: 'Categoria encontrada',
-            $ref: '#/components/schemas/Category'
-          },
-          404: {
-            description: 'Categoria não encontrada',
-            $ref: '#/components/schemas/Error'
-          },
-          401: {
-            description: 'Não autorizado',
-            $ref: '#/components/schemas/Error'
+            type: 'object',
+            properties: {
+              id: { type: 'string', format: 'uuid' },
+              userId: { type: 'string' },
+              name: { type: 'string' },
+              type: { type: 'string', enum: ['INCOME', 'EXPENSE'] },
+              color: { type: 'string' },
+              icon: { type: 'string' },
+              createdAt: { type: 'string', format: 'date-time' },
+              updatedAt: { type: 'string', format: 'date-time' }
+            }
           }
         }
       }
@@ -169,19 +180,10 @@ export default async function categoryRoutes(fastify) {
         response: {
           200: {
             description: 'Categoria deletada com sucesso',
-            $ref: '#/components/schemas/SuccessMessage'
-          },
-          400: {
-            description: 'Categoria possui transações associadas',
-            $ref: '#/components/schemas/Error'
-          },
-          404: {
-            description: 'Categoria não encontrada',
-            $ref: '#/components/schemas/Error'
-          },
-          401: {
-            description: 'Não autorizado',
-            $ref: '#/components/schemas/Error'
+            type: 'object',
+            properties: {
+              message: { type: 'string' }
+            }
           }
         }
       }
@@ -233,19 +235,17 @@ export default async function categoryRoutes(fastify) {
         response: {
           200: {
             description: 'Categoria atualizada com sucesso',
-            $ref: '#/components/schemas/Category'
-          },
-          400: {
-            description: 'Erro de validação',
-            $ref: '#/components/schemas/Error'
-          },
-          404: {
-            description: 'Categoria não encontrada',
-            $ref: '#/components/schemas/Error'
-          },
-          401: {
-            description: 'Não autorizado',
-            $ref: '#/components/schemas/Error'
+            type: 'object',
+            properties: {
+              id: { type: 'string', format: 'uuid' },
+              userId: { type: 'string' },
+              name: { type: 'string' },
+              type: { type: 'string', enum: ['INCOME', 'EXPENSE'] },
+              color: { type: 'string' },
+              icon: { type: 'string' },
+              createdAt: { type: 'string', format: 'date-time' },
+              updatedAt: { type: 'string', format: 'date-time' }
+            }
           }
         }
       }

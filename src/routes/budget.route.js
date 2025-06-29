@@ -20,20 +20,46 @@ export default async function budgetRoutes(fastify) {
         summary: 'Criar novo orçamento',
         description: 'Cria um novo orçamento para uma categoria específica',
         body: {
-          $ref: '#/components/schemas/CreateBudget'
+          type: 'object',
+          required: ['categoryId', 'limit', 'date'],
+          properties: {
+            categoryId: {
+              type: 'string',
+              format: 'uuid',
+              description: 'ID da categoria associada'
+            },
+            limit: {
+              type: 'number',
+              format: 'float',
+              minimum: 0,
+              description: 'Limite do orçamento'
+            },
+            date: {
+              type: 'string',
+              format: 'date-time',
+              description: 'Data do orçamento'
+            }
+          }
         },
         response: {
           201: {
             description: 'Orçamento criado com sucesso',
-            $ref: '#/components/schemas/Budget'
+            type: 'object',
+            properties: {
+              id: { type: 'string', format: 'uuid' },
+              userId: { type: 'string' },
+              categoryId: { type: 'string', format: 'uuid' },
+              limit: { type: 'number', format: 'float' },
+              spent: { type: 'string' },
+              date: { type: 'string', format: 'date-time' }
+            }
           },
           400: {
             description: 'Erro de validação',
-            $ref: '#/components/schemas/Error'
-          },
-          401: {
-            description: 'Não autorizado',
-            $ref: '#/components/schemas/Error'
+            type: 'object',
+            properties: {
+              message: { type: 'string' }
+            }
           }
         }
       }
@@ -53,12 +79,16 @@ export default async function budgetRoutes(fastify) {
             description: 'Lista de orçamentos',
             type: 'array',
             items: {
-              $ref: '#/components/schemas/Budget'
+              type: 'object',
+              properties: {
+                id: { type: 'string', format: 'uuid' },
+                userId: { type: 'string' },
+                categoryId: { type: 'string', format: 'uuid' },
+                limit: { type: 'number', format: 'float' },
+                spent: { type: 'string' },
+                date: { type: 'string', format: 'date-time' }
+              }
             }
-          },
-          401: {
-            description: 'Não autorizado',
-            $ref: '#/components/schemas/Error'
           }
         }
       }
@@ -88,15 +118,22 @@ export default async function budgetRoutes(fastify) {
         response: {
           200: {
             description: 'Orçamento encontrado',
-            $ref: '#/components/schemas/Budget'
+            type: 'object',
+            properties: {
+              id: { type: 'string', format: 'uuid' },
+              userId: { type: 'string' },
+              categoryId: { type: 'string', format: 'uuid' },
+              limit: { type: 'number', format: 'float' },
+              spent: { type: 'string' },
+              date: { type: 'string', format: 'date-time' }
+            }
           },
           404: {
             description: 'Orçamento não encontrado',
-            $ref: '#/components/schemas/Error'
-          },
-          401: {
-            description: 'Não autorizado',
-            $ref: '#/components/schemas/Error'
+            type: 'object',
+            properties: {
+              message: { type: 'string' }
+            }
           }
         }
       }
@@ -126,15 +163,10 @@ export default async function budgetRoutes(fastify) {
         response: {
           200: {
             description: 'Orçamento deletado com sucesso',
-            $ref: '#/components/schemas/SuccessMessage'
-          },
-          404: {
-            description: 'Orçamento não encontrado',
-            $ref: '#/components/schemas/Error'
-          },
-          401: {
-            description: 'Não autorizado',
-            $ref: '#/components/schemas/Error'
+            type: 'object',
+            properties: {
+              message: { type: 'string' }
+            }
           }
         }
       }
@@ -185,19 +217,15 @@ export default async function budgetRoutes(fastify) {
         response: {
           200: {
             description: 'Orçamento atualizado com sucesso',
-            $ref: '#/components/schemas/Budget'
-          },
-          400: {
-            description: 'Erro de validação',
-            $ref: '#/components/schemas/Error'
-          },
-          404: {
-            description: 'Orçamento não encontrado',
-            $ref: '#/components/schemas/Error'
-          },
-          401: {
-            description: 'Não autorizado',
-            $ref: '#/components/schemas/Error'
+            type: 'object',
+            properties: {
+              id: { type: 'string', format: 'uuid' },
+              userId: { type: 'string' },
+              categoryId: { type: 'string', format: 'uuid' },
+              limit: { type: 'number', format: 'float' },
+              spent: { type: 'string' },
+              date: { type: 'string', format: 'date-time' }
+            }
           }
         }
       }

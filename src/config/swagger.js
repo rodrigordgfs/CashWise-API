@@ -142,9 +142,6 @@ export const swaggerOptions = {
               type: 'boolean',
               description: 'Status de pagamento'
             },
-            category: {
-              $ref: '#/components/schemas/Category'
-            },
             createdAt: {
               type: 'string',
               format: 'date-time',
@@ -223,9 +220,6 @@ export const swaggerOptions = {
               format: 'date-time',
               description: 'Data do orçamento'
             },
-            category: {
-              $ref: '#/components/schemas/Category'
-            },
             createdAt: {
               type: 'string',
               format: 'date-time',
@@ -299,9 +293,6 @@ export const swaggerOptions = {
               type: 'string',
               format: 'date-time',
               description: 'Prazo da meta'
-            },
-            category: {
-              $ref: '#/components/schemas/Category'
             },
             createdAt: {
               type: 'string',
