@@ -39,16 +39,44 @@ export default async function reportRoutes(fastify) {
             description: 'Relatório mensal',
             type: 'array',
             items: {
-              $ref: '#/components/schemas/MonthlyReport'
+              type: 'object',
+              properties: {
+                name: {
+                  type: 'string',
+                  description: 'Nome do mês/ano'
+                },
+                income: {
+                  type: 'number',
+                  format: 'float',
+                  description: 'Total de receitas'
+                },
+                expense: {
+                  type: 'number',
+                  format: 'float',
+                  description: 'Total de despesas'
+                }
+              }
             }
           },
           400: {
             description: 'Erro de validação',
-            $ref: '#/components/schemas/Error'
+            type: 'object',
+            properties: {
+              message: {
+                type: 'string',
+                description: 'Mensagem de erro'
+              }
+            }
           },
           401: {
             description: 'Não autorizado',
-            $ref: '#/components/schemas/Error'
+            type: 'object',
+            properties: {
+              message: {
+                type: 'string',
+                description: 'Mensagem de erro'
+              }
+            }
           }
         }
       }
@@ -90,16 +118,43 @@ export default async function reportRoutes(fastify) {
             description: 'Relatório por categorias',
             type: 'array',
             items: {
-              $ref: '#/components/schemas/CategoryReport'
+              type: 'object',
+              properties: {
+                name: {
+                  type: 'string',
+                  description: 'Nome da categoria'
+                },
+                value: {
+                  type: 'number',
+                  format: 'float',
+                  description: 'Valor total da categoria'
+                },
+                fill: {
+                  type: 'string',
+                  description: 'Cor da categoria'
+                }
+              }
             }
           },
           400: {
             description: 'Erro de validação',
-            $ref: '#/components/schemas/Error'
+            type: 'object',
+            properties: {
+              message: {
+                type: 'string',
+                description: 'Mensagem de erro'
+              }
+            }
           },
           401: {
             description: 'Não autorizado',
-            $ref: '#/components/schemas/Error'
+            type: 'object',
+            properties: {
+              message: {
+                type: 'string',
+                description: 'Mensagem de erro'
+              }
+            }
           }
         }
       }
@@ -136,16 +191,39 @@ export default async function reportRoutes(fastify) {
             description: 'Relatório de saldo',
             type: 'array',
             items: {
-              $ref: '#/components/schemas/BalanceReport'
+              type: 'object',
+              properties: {
+                name: {
+                  type: 'string',
+                  description: 'Nome do mês'
+                },
+                balance: {
+                  type: 'number',
+                  format: 'float',
+                  description: 'Saldo do mês'
+                }
+              }
             }
           },
           400: {
             description: 'Erro de validação',
-            $ref: '#/components/schemas/Error'
+            type: 'object',
+            properties: {
+              message: {
+                type: 'string',
+                description: 'Mensagem de erro'
+              }
+            }
           },
           401: {
             description: 'Não autorizado',
-            $ref: '#/components/schemas/Error'
+            type: 'object',
+            properties: {
+              message: {
+                type: 'string',
+                description: 'Mensagem de erro'
+              }
+            }
           }
         }
       }
@@ -180,15 +258,44 @@ export default async function reportRoutes(fastify) {
         response: {
           200: {
             description: 'Resumo financeiro',
-            $ref: '#/components/schemas/SummaryReport'
+            type: 'object',
+            properties: {
+              income: {
+                type: 'number',
+                format: 'float',
+                description: 'Total de receitas'
+              },
+              expense: {
+                type: 'number',
+                format: 'float',
+                description: 'Total de despesas'
+              },
+              balance: {
+                type: 'number',
+                format: 'float',
+                description: 'Saldo total'
+              }
+            }
           },
           400: {
             description: 'Erro de validação',
-            $ref: '#/components/schemas/Error'
+            type: 'object',
+            properties: {
+              message: {
+                type: 'string',
+                description: 'Mensagem de erro'
+              }
+            }
           },
           401: {
             description: 'Não autorizado',
-            $ref: '#/components/schemas/Error'
+            type: 'object',
+            properties: {
+              message: {
+                type: 'string',
+                description: 'Mensagem de erro'
+              }
+            }
           }
         }
       }
