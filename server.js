@@ -3,6 +3,7 @@ import cors from "@fastify/cors";
 import { createRequire } from "node:module";
 import routes from "./src/routes/index.js";
 import environment from "./src/config/envs.js";
+import { swaggerOptions, swaggerUiOptions } from "./src/config/swagger.js";
 
 const require = createRequire(import.meta.url);
 const { clerkPlugin } = require("@clerk/fastify");
@@ -37,6 +38,10 @@ app.register(cors, {
   ],
 });
 
+/* ----- Swagger Documentation ----- */
+await app.register(import("@fastify/swagger"), swaggerOptions);
+await app.register(import("@fastify/swagger-ui"), swaggerUiOptions);
+
 /* ----- Auth (Clerk) ----- */
 app.register(clerkPlugin, {
   secretKey: environment.secretKey,
@@ -53,9 +58,10 @@ await app.register(routes);
 /* ----- Start ----- */
 app
   .listen({ port: environment.port ?? 8080, host: "0.0.0.0" })
-  .then(() =>
-    console.log(`🚀  Server rodando na porta ${environment.port ?? 8080}`),
-  )
+  .then(() => {
+    console.log(`🚀  Server rodando na porta ${environment.port ?? 8080}`);
+    console.log(`📚  Documentação disponível em: http://localhost:${environment.port ?? 8080}/docs`);
+  })
   .catch((err) => {
     console.error("Erro ao iniciar o servidor:", err);
     process.exit(1);
