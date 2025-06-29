@@ -58,15 +58,76 @@ export default async function goalRoutes(fastify) {
         response: {
           201: {
             description: 'Meta criada com sucesso',
-            $ref: '#/components/schemas/Goal'
+            type: 'object',
+            properties: {
+              id: {
+                type: 'string',
+                format: 'uuid',
+                description: 'ID único da meta'
+              },
+              userId: {
+                type: 'string',
+                description: 'ID do usuário proprietário'
+              },
+              categoryId: {
+                type: 'string',
+                format: 'uuid',
+                description: 'ID da categoria associada'
+              },
+              title: {
+                type: 'string',
+                description: 'Título da meta'
+              },
+              description: {
+                type: 'string',
+                description: 'Descrição da meta'
+              },
+              targetAmount: {
+                type: 'number',
+                format: 'float',
+                description: 'Valor alvo da meta'
+              },
+              currentAmount: {
+                type: 'number',
+                format: 'float',
+                description: 'Valor atual da meta'
+              },
+              deadline: {
+                type: 'string',
+                format: 'date-time',
+                description: 'Prazo da meta'
+              },
+              createdAt: {
+                type: 'string',
+                format: 'date-time',
+                description: 'Data de criação'
+              },
+              updatedAt: {
+                type: 'string',
+                format: 'date-time',
+                description: 'Data da última atualização'
+              }
+            }
           },
           400: {
             description: 'Erro de validação',
-            $ref: '#/components/schemas/Error'
+            type: 'object',
+            properties: {
+              message: {
+                type: 'string',
+                description: 'Mensagem de erro'
+              }
+            }
           },
           401: {
             description: 'Não autorizado',
-            $ref: '#/components/schemas/Error'
+            type: 'object',
+            properties: {
+              message: {
+                type: 'string',
+                description: 'Mensagem de erro'
+              }
+            }
           }
         }
       }
@@ -86,12 +147,67 @@ export default async function goalRoutes(fastify) {
             description: 'Lista de metas',
             type: 'array',
             items: {
-              $ref: '#/components/schemas/Goal'
+              type: 'object',
+              properties: {
+                id: {
+                  type: 'string',
+                  format: 'uuid',
+                  description: 'ID único da meta'
+                },
+                userId: {
+                  type: 'string',
+                  description: 'ID do usuário proprietário'
+                },
+                categoryId: {
+                  type: 'string',
+                  format: 'uuid',
+                  description: 'ID da categoria associada'
+                },
+                title: {
+                  type: 'string',
+                  description: 'Título da meta'
+                },
+                description: {
+                  type: 'string',
+                  description: 'Descrição da meta'
+                },
+                targetAmount: {
+                  type: 'number',
+                  format: 'float',
+                  description: 'Valor alvo da meta'
+                },
+                currentAmount: {
+                  type: 'number',
+                  format: 'float',
+                  description: 'Valor atual da meta'
+                },
+                deadline: {
+                  type: 'string',
+                  format: 'date-time',
+                  description: 'Prazo da meta'
+                },
+                createdAt: {
+                  type: 'string',
+                  format: 'date-time',
+                  description: 'Data de criação'
+                },
+                updatedAt: {
+                  type: 'string',
+                  format: 'date-time',
+                  description: 'Data da última atualização'
+                }
+              }
             }
           },
           401: {
             description: 'Não autorizado',
-            $ref: '#/components/schemas/Error'
+            type: 'object',
+            properties: {
+              message: {
+                type: 'string',
+                description: 'Mensagem de erro'
+              }
+            }
           }
         }
       }
@@ -121,15 +237,76 @@ export default async function goalRoutes(fastify) {
         response: {
           200: {
             description: 'Meta encontrada',
-            $ref: '#/components/schemas/Goal'
+            type: 'object',
+            properties: {
+              id: {
+                type: 'string',
+                format: 'uuid',
+                description: 'ID único da meta'
+              },
+              userId: {
+                type: 'string',
+                description: 'ID do usuário proprietário'
+              },
+              categoryId: {
+                type: 'string',
+                format: 'uuid',
+                description: 'ID da categoria associada'
+              },
+              title: {
+                type: 'string',
+                description: 'Título da meta'
+              },
+              description: {
+                type: 'string',
+                description: 'Descrição da meta'
+              },
+              targetAmount: {
+                type: 'number',
+                format: 'float',
+                description: 'Valor alvo da meta'
+              },
+              currentAmount: {
+                type: 'number',
+                format: 'float',
+                description: 'Valor atual da meta'
+              },
+              deadline: {
+                type: 'string',
+                format: 'date-time',
+                description: 'Prazo da meta'
+              },
+              createdAt: {
+                type: 'string',
+                format: 'date-time',
+                description: 'Data de criação'
+              },
+              updatedAt: {
+                type: 'string',
+                format: 'date-time',
+                description: 'Data da última atualização'
+              }
+            }
           },
           404: {
             description: 'Meta não encontrada',
-            $ref: '#/components/schemas/Error'
+            type: 'object',
+            properties: {
+              message: {
+                type: 'string',
+                description: 'Mensagem de erro'
+              }
+            }
           },
           401: {
             description: 'Não autorizado',
-            $ref: '#/components/schemas/Error'
+            type: 'object',
+            properties: {
+              message: {
+                type: 'string',
+                description: 'Mensagem de erro'
+              }
+            }
           }
         }
       }
@@ -159,15 +336,33 @@ export default async function goalRoutes(fastify) {
         response: {
           200: {
             description: 'Meta deletada com sucesso',
-            $ref: '#/components/schemas/SuccessMessage'
+            type: 'object',
+            properties: {
+              message: {
+                type: 'string',
+                description: 'Mensagem de sucesso'
+              }
+            }
           },
           404: {
             description: 'Meta não encontrada',
-            $ref: '#/components/schemas/Error'
+            type: 'object',
+            properties: {
+              message: {
+                type: 'string',
+                description: 'Mensagem de erro'
+              }
+            }
           },
           401: {
             description: 'Não autorizado',
-            $ref: '#/components/schemas/Error'
+            type: 'object',
+            properties: {
+              message: {
+                type: 'string',
+                description: 'Mensagem de erro'
+              }
+            }
           }
         }
       }
@@ -232,19 +427,86 @@ export default async function goalRoutes(fastify) {
         response: {
           200: {
             description: 'Meta atualizada com sucesso',
-            $ref: '#/components/schemas/Goal'
+            type: 'object',
+            properties: {
+              id: {
+                type: 'string',
+                format: 'uuid',
+                description: 'ID único da meta'
+              },
+              userId: {
+                type: 'string',
+                description: 'ID do usuário proprietário'
+              },
+              categoryId: {
+                type: 'string',
+                format: 'uuid',
+                description: 'ID da categoria associada'
+              },
+              title: {
+                type: 'string',
+                description: 'Título da meta'
+              },
+              description: {
+                type: 'string',
+                description: 'Descrição da meta'
+              },
+              targetAmount: {
+                type: 'number',
+                format: 'float',
+                description: 'Valor alvo da meta'
+              },
+              currentAmount: {
+                type: 'number',
+                format: 'float',
+                description: 'Valor atual da meta'
+              },
+              deadline: {
+                type: 'string',
+                format: 'date-time',
+                description: 'Prazo da meta'
+              },
+              createdAt: {
+                type: 'string',
+                format: 'date-time',
+                description: 'Data de criação'
+              },
+              updatedAt: {
+                type: 'string',
+                format: 'date-time',
+                description: 'Data da última atualização'
+              }
+            }
           },
           400: {
             description: 'Erro de validação',
-            $ref: '#/components/schemas/Error'
+            type: 'object',
+            properties: {
+              message: {
+                type: 'string',
+                description: 'Mensagem de erro'
+              }
+            }
           },
           404: {
             description: 'Meta não encontrada',
-            $ref: '#/components/schemas/Error'
+            type: 'object',
+            properties: {
+              message: {
+                type: 'string',
+                description: 'Mensagem de erro'
+              }
+            }
           },
           401: {
             description: 'Não autorizado',
-            $ref: '#/components/schemas/Error'
+            type: 'object',
+            properties: {
+              message: {
+                type: 'string',
+                description: 'Mensagem de erro'
+              }
+            }
           }
         }
       }
