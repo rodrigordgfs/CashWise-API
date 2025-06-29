@@ -4,10 +4,6 @@ const { getAuth } = require('@clerk/fastify');
 
 const clerkAuth = async (request, reply) => {
   try {
-    if (request.url.startsWith('/docs')) {
-      return;
-    }
-
     const { userId } = await getAuth(request);
 
     if (!userId) {
