@@ -20,7 +20,40 @@ export default async function goalRoutes(fastify) {
         summary: 'Criar nova meta',
         description: 'Cria uma nova meta financeira para o usuário autenticado',
         body: {
-          $ref: '#/components/schemas/CreateGoal'
+          type: 'object',
+          required: ['categoryId', 'title', 'targetAmount', 'deadline'],
+          properties: {
+            categoryId: {
+              type: 'string',
+              format: 'uuid',
+              description: 'ID da categoria associada'
+            },
+            title: {
+              type: 'string',
+              description: 'Título da meta'
+            },
+            description: {
+              type: 'string',
+              description: 'Descrição da meta'
+            },
+            targetAmount: {
+              type: 'number',
+              format: 'float',
+              minimum: 0,
+              description: 'Valor alvo da meta'
+            },
+            currentAmount: {
+              type: 'number',
+              format: 'float',
+              minimum: 0,
+              description: 'Valor atual da meta'
+            },
+            deadline: {
+              type: 'string',
+              format: 'date-time',
+              description: 'Prazo da meta'
+            }
+          }
         },
         response: {
           201: {
