@@ -6,6 +6,9 @@ import {
   categoryQuerySchema,
 } from "../schemas/category.schema.js";
 
+/**
+ * Registers HTTP routes for category management on the Fastify instance, including creation, retrieval, updating, and deletion of categories with request validation.
+ */
 export default async function categoryRoutes(fastify) {
   const v = fastify.zodValidate;
 

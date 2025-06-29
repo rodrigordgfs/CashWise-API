@@ -5,6 +5,11 @@ import {
   idParamSchema,
 } from "../schemas/budget.schema.js";
 
+/**
+ * Registers HTTP routes for budget management on the Fastify instance, including validation of request data.
+ *
+ * Defines endpoints for creating, listing, retrieving by ID, updating, and deleting budgets, with request validation using Zod schemas.
+ */
 export default async function budgetRoutes(fastify) {
   const v = fastify.zodValidate;
 
