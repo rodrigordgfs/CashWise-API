@@ -1,10 +1,33 @@
 import reportController from "../controllers/report.controller.js";
+import {
+  basePeriodSchema,
+  reportWithLimitSchema,
+} from "../schemas/report.schema.js";
 
-const reportRoute = (fastify) => {
-  fastify.get("/reports/monthly", reportController.listMonthlyReports);
-  fastify.get("/reports/categories", reportController.listCategoriesWithTransactions);
-  fastify.get("/reports/balance", reportController.listBalanceReports);
-  fastify.get("/reports/summary", reportController.listSummaryReports);
-};
+export default async function reportRoutes(fastify) {
+  const v = fastify.zodValidate;
 
-export default reportRoute;
+  fastify.get(
+    "/report/monthly",
+    { preHandler: v({ query: basePeriodSchema }) },
+    reportController.listMonthlyReports
+  );
+
+  fastify.get(
+    "/report/categories",
+    { preHandler: v({ query: reportWithLimitSchema }) },
+    reportController.listCategoriesWithTransactions
+  );
+
+  fastify.get(
+    "/report/balance",
+    { preHandler: v({ query: basePeriodSchema }) },
+    reportController.listBalanceReports
+  );
+
+  fastify.get(
+    "/report/summary",
+    { preHandler: v({ query: basePeriodSchema }) },
+    reportController.listSummaryReports
+  );
+}

@@ -14,7 +14,7 @@ const routes = async (fastify) => {
   await fastify.register(categoryRoute);
   await fastify.register(transactionRoute);
   await fastify.register(budgetRoute);
-  fastify.register(reportRoute);
+  await fastify.register(reportRoute);
 };
 
 export default routes;
