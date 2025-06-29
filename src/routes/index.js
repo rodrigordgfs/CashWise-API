@@ -13,7 +13,7 @@ const routes = async (fastify) => {
   fastify.register(goalRoute);
   fastify.register(categoryRoute);
   await fastify.register(transactionRoute);
-  fastify.register(budgetRoute);
+  await fastify.register(budgetRoute);
   fastify.register(reportRoute);
 };
 
