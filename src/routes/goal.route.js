@@ -5,6 +5,9 @@ import {
   idParamSchema,
 } from "../schemas/goal.schema.js";
 
+/**
+ * Registers HTTP routes for goal management on the Fastify instance, including creation, retrieval, updating, and deletion of goals with schema validation for request bodies and parameters.
+ */
 export default async function goalRoutes(fastify) {
   const v = fastify.zodValidate;
 

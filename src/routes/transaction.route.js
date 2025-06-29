@@ -7,6 +7,11 @@ import {
   updateTransactionSchema,
 } from "../schemas/transaction.schema.js";
 
+/**
+ * Registers transaction-related HTTP routes on the Fastify instance with schema validation and controller handlers.
+ *
+ * Sets up endpoints for creating, importing, listing, retrieving, updating, and deleting transactions, applying Zod-based validation to request bodies, query parameters, and route parameters before invoking the corresponding controller methods.
+ */
 export default async function transactionRoute(fastify) {
   const v = fastify.zodValidate;   // atalho opcional
 
