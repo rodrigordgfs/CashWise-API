@@ -1,5 +1,5 @@
 import { addDays, addMonths, addWeeks, addYears, endOfMonth, getDate, isLastDayOfMonth, setDate } from "date-fns";
-import { toZonedISOString } from "./toZonedISOString";
+import { toZonedISOString } from "./toZonedISOString.js";
 
 const timeZone = "America/Sao_Paulo";
 
