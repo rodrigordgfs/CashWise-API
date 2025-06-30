@@ -2,6 +2,12 @@ import { StatusCodes } from "http-status-codes";
 import AppError, { handleErrorResponse } from "../utils/error.js";
 import categoryService from "../services/category.service.js";
 
+/**
+ * Creates a new category for the authenticated user
+ * @param {import('fastify').FastifyRequest} req - The request object containing category data
+ * @param {import('fastify').FastifyReply} reply - The reply object to send response
+ * @returns {Promise<void>} Promise that resolves when category is created
+ */
 const createCategory = async (req, reply) => {
   try {
     const { name, type, color, icon } = req.body;
@@ -18,6 +24,12 @@ const createCategory = async (req, reply) => {
   }
 };
 
+/**
+ * Lists categories for the authenticated user with optional filtering and pagination
+ * @param {import('fastify').FastifyRequest} req - The request object containing query parameters
+ * @param {import('fastify').FastifyReply} reply - The reply object to send response
+ * @returns {Promise<void>} Promise that resolves with paginated list of categories
+ */
 const listCategories = async (req, reply) => {
   try {
     const { type, page = 1, perPage = 10 } = req.query;
@@ -42,6 +54,12 @@ const listCategories = async (req, reply) => {
   }
 };
 
+/**
+ * Retrieves a specific category by its ID
+ * @param {import('fastify').FastifyRequest} req - The request object containing category ID in params
+ * @param {import('fastify').FastifyReply} reply - The reply object to send response
+ * @returns {Promise<void>} Promise that resolves with category data
+ */
 const listCategoryById = async (req, reply) => {
   try {
     const category = await categoryService.listCategoryById(req.params.id);
@@ -56,6 +74,12 @@ const listCategoryById = async (req, reply) => {
   }
 };
 
+/**
+ * Deletes a category by its ID (only if no transactions are associated)
+ * @param {import('fastify').FastifyRequest} req - The request object containing category ID in params
+ * @param {import('fastify').FastifyReply} reply - The reply object to send response
+ * @returns {Promise<void>} Promise that resolves when category is deleted
+ */
 const deleteCategory = async (req, reply) => {
   try {
     const deleted = await categoryService.deleteCategory(req.params.id);
@@ -72,6 +96,12 @@ const deleteCategory = async (req, reply) => {
   }
 };
 
+/**
+ * Updates an existing category with new data
+ * @param {import('fastify').FastifyRequest} req - The request object containing category ID and update data
+ * @param {import('fastify').FastifyReply} reply - The reply object to send response
+ * @returns {Promise<void>} Promise that resolves with updated category data
+ */
 const updateCategory = async (req, reply) => {
   try {
     const category = await categoryService.updateCategory(

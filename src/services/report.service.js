@@ -4,9 +4,22 @@ import categoryRepository from "../repositories/category.repository.js";
 import { format, parseISO } from "date-fns";
 import { ptBR } from "date-fns/locale";
 
+/**
+ * Capitalizes the first letter of a string
+ * @param {string} str - The string to capitalize
+ * @returns {string} The capitalized string
+ */
 const capitalize = (str) =>
   str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
 
+/**
+ * Generates monthly financial reports with income and expense totals
+ * @param {string} userId - The ID of the user for the report
+ * @param {string} period__gte - The start date for the report period (ISO string)
+ * @param {string} period__lte - The end date for the report period (ISO string)
+ * @returns {Promise<Array>} Promise that resolves with array of monthly report objects
+ * @throws {AppError} When report generation fails
+ */
 const listMonthlyReports = async (userId, period__gte, period__lte) => {
   try {
     const periodDateGte = new Date(period__gte);
@@ -63,6 +76,15 @@ const listMonthlyReports = async (userId, period__gte, period__lte) => {
   }
 };
 
+/**
+ * Generates category-based financial reports with transaction totals
+ * @param {string} userId - The ID of the user for the report
+ * @param {string} period__gte - The start date for the report period (ISO string)
+ * @param {string} period__lte - The end date for the report period (ISO string)
+ * @param {number} [limit] - Optional limit for number of categories to return
+ * @returns {Promise<Array>} Promise that resolves with array of category report objects
+ * @throws {AppError} When report generation fails
+ */
 const listCategoriesReports = async (
   userId,
   period__gte,
@@ -101,8 +123,14 @@ const listCategoriesReports = async (
   }
 };
 
-
-
+/**
+ * Generates balance reports showing monthly financial balance (income - expenses)
+ * @param {string} userId - The ID of the user for the report
+ * @param {string} period__gte - The start date for the report period (ISO string)
+ * @param {string} period__lte - The end date for the report period (ISO string)
+ * @returns {Promise<Array>} Promise that resolves with array of balance report objects
+ * @throws {AppError} When report generation fails
+ */
 const listBalanceReports = async (userId, period__gte, period__lte) => {
   try {
     const periodDateGte = new Date(period__gte);
@@ -167,6 +195,14 @@ const listBalanceReports = async (userId, period__gte, period__lte) => {
   }
 };
 
+/**
+ * Generates summary financial reports with consolidated totals for a period
+ * @param {string} userId - The ID of the user for the report
+ * @param {Date} period__gte - The start date for the report period
+ * @param {Date} period__lte - The end date for the report period
+ * @returns {Promise<Object>} Promise that resolves with summary report object containing income, expense, and balance
+ * @throws {AppError} When report generation fails
+ */
 const listSummaryReports = async (userId, period__gte, period__lte) => {
   try {
     const { transactions } = await transactionRepository.listTransactions(

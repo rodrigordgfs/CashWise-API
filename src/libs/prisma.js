@@ -3,6 +3,11 @@ const { PrismaClient } = pkg;
 
 let prisma;
 
+/**
+ * Creates and configures a Prisma client instance
+ * Uses singleton pattern to ensure only one instance exists
+ * Configures different logging levels based on environment
+ */
 if (process.env.NODE_ENV === "production") {
   prisma = new PrismaClient({
     log: ["query", "error", "warn", "info"],

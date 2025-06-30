@@ -2,6 +2,12 @@ import { StatusCodes } from "http-status-codes";
 import AppError, { handleErrorResponse } from "../utils/error.js";
 import transactionService from "../services/transaction.service.js";
 
+/**
+ * Creates a new financial transaction for the authenticated user
+ * @param {import('fastify').FastifyRequest} req - The request object containing transaction data
+ * @param {import('fastify').FastifyReply} reply - The reply object to send response
+ * @returns {Promise<void>} Promise that resolves when transaction is created
+ */
 const createTransaction = async (req, reply) => {
   try {
     const transaction = await transactionService.createTransaction(
@@ -14,6 +20,12 @@ const createTransaction = async (req, reply) => {
   }
 };
 
+/**
+ * Creates multiple transactions from OFX data import
+ * @param {import('fastify').FastifyRequest} req - The request object containing array of OFX transactions
+ * @param {import('fastify').FastifyReply} reply - The reply object to send response
+ * @returns {Promise<void>} Promise that resolves when transactions are imported
+ */
 const createTransactionsFromOfx = async (req, reply) => {
   try {
     const transactions = await transactionService.createTransactionsFromOfx(
@@ -26,6 +38,12 @@ const createTransactionsFromOfx = async (req, reply) => {
   }
 };
 
+/**
+ * Lists transactions for the authenticated user with advanced filtering and pagination
+ * @param {import('fastify').FastifyRequest} req - The request object containing query filters
+ * @param {import('fastify').FastifyReply} reply - The reply object to send response
+ * @returns {Promise<void>} Promise that resolves with paginated list of transactions
+ */
 const listTransactions = async (req, reply) => {
   try {
     const {
@@ -65,6 +83,12 @@ const listTransactions = async (req, reply) => {
   }
 };
 
+/**
+ * Retrieves a specific transaction by its ID
+ * @param {import('fastify').FastifyRequest} req - The request object containing transaction ID in params
+ * @param {import('fastify').FastifyReply} reply - The reply object to send response
+ * @returns {Promise<void>} Promise that resolves with transaction data
+ */
 const listTransactionById = async (req, reply) => {
   try {
     const transaction = await transactionService.listTransactionById(req.params.id);
@@ -75,6 +99,12 @@ const listTransactionById = async (req, reply) => {
   }
 };
 
+/**
+ * Deletes a transaction by its ID
+ * @param {import('fastify').FastifyRequest} req - The request object containing transaction ID in params
+ * @param {import('fastify').FastifyReply} reply - The reply object to send response
+ * @returns {Promise<void>} Promise that resolves when transaction is deleted
+ */
 const deleteTransaction = async (req, reply) => {
   try {
     const deleted = await transactionService.deleteTransaction(req.params.id);
@@ -85,6 +115,12 @@ const deleteTransaction = async (req, reply) => {
   }
 };
 
+/**
+ * Updates an existing transaction with new data
+ * @param {import('fastify').FastifyRequest} req - The request object containing transaction ID and update data
+ * @param {import('fastify').FastifyReply} reply - The reply object to send response
+ * @returns {Promise<void>} Promise that resolves with updated transaction data
+ */
 const updateTransaction = async (req, reply) => {
   try {
     const updated = await transactionService.updateTransaction(req.params.id, req.body);

@@ -1,4 +1,3 @@
-// src/plugins/zodValidate.js
 import fp from "fastify-plugin";
 
 /**
@@ -20,6 +19,12 @@ function makeValidator({ body, query, params }) {
   };
 }
 
+/**
+ * Fastify plugin that provides Zod validation functionality
+ * Decorates the Fastify instance with a zodValidate method for request validation
+ * @param {import('fastify').FastifyInstance} fastify - The Fastify instance
+ * @returns {Promise<void>} Promise that resolves when plugin is registered
+ */
 export default fp(async (fastify) => {
   fastify.decorate("zodValidate", makeValidator);
 });
