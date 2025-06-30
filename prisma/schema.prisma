@@ -42,8 +42,6 @@ model Transaction {
   account               String?
   amount                Float
   paid                  Boolean      @default(false)
-  recurringCount        Int?         @default(0)
-  recurringInterval     Int?         @default(0)
   category              Category?    @relation(fields: [categoryId], references: [id])
   createdAt             DateTime     @default(now())
   updatedAt             DateTime     @updatedAt
