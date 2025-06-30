@@ -32,18 +32,21 @@ model Category {
 }
 
 model Transaction {
-  id          String       @id @default(uuid())
-  userId      String
-  type        CategoryType
-  description String
-  categoryId  String?
-  date        DateTime
-  account     String?
-  amount      Float
-  paid        Boolean      @default(false)
-  category    Category?    @relation(fields: [categoryId], references: [id])
-  createdAt   DateTime     @default(now())
-  updatedAt   DateTime     @updatedAt
+  id                    String       @id @default(uuid())
+  transactionOriginalId String?
+  userId                String
+  type                  CategoryType
+  description           String
+  categoryId            String?
+  date                  DateTime
+  account               String?
+  amount                Float
+  paid                  Boolean      @default(false)
+  recurringCount        Int?         @default(0)
+  recurringInterval     Int?         @default(0)
+  category              Category?    @relation(fields: [categoryId], references: [id])
+  createdAt             DateTime     @default(now())
+  updatedAt             DateTime     @updatedAt
 
   @@index([userId])
   @@map("transactions")

@@ -1,4 +1,5 @@
 import transactionRepository from "../repositories/transaction.repository.js";
+import { buildRecurringDates } from "../utils/buildRecurringDates.js";
 import AppError from "../utils/error.js";
 
 /**
@@ -10,6 +11,8 @@ import AppError from "../utils/error.js";
  * @param {Date} date - The date of the transaction
  * @param {string} account - The account used for the transaction
  * @param {number} amount - The amount of the transaction
+ * @param {number} [recurringCount=0] - Optional count for recurring transactions
+ * @param {number} [recurringInterval=0] - Optional interval for recurring transactions
  * @returns {Promise<Object>} Promise that resolves with the created transaction data
  * @throws {AppError} When transaction creation fails
  */
@@ -20,10 +23,13 @@ const createTransaction = async (
   categoryId,
   date,
   account,
-  amount
+  amount,
+  recurringInterval = 0,
+  recurringCount = 0
 ) => {
   try {
-    return await transactionRepository.createTransaction(
+    // 1. Salva a transação original
+    const original = await transactionRepository.createTransaction(
       userId,
       type,
       description,
@@ -32,6 +38,30 @@ const createTransaction = async (
       account,
       amount
     );
+
+    // 2. Gera recorrentes (se houver) e salva em lote
+    if (recurringCount > 0 && recurringInterval > 0) {
+      const dates = buildRecurringDates(
+        new Date(date),
+        recurringCount,
+        recurringInterval
+      );
+
+      const children = dates.map((d) => ({
+        userId,
+        transactionOriginalId: original.id,
+        type,
+        description,
+        categoryId,
+        date: d,
+        account,
+        amount,
+      }));
+
+      await transactionRepository.createManyTransactions(children);
+    }
+
+    return original;
   } catch (error) {
     throw new AppError(error.message);
   }

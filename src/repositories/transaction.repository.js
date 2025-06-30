@@ -72,7 +72,23 @@ const createTransactionsFromOfx = async (userId, transactions) => {
   } catch (error) {
     logError(error);
   }
-}
+};
+
+/**
+ * Creates recurring transactions based on original transaction data
+ * @param data - Array of transaction data including recurrence details
+ * @returns {Promise<Object>} Promise that resolves with batch creation result
+ * @throws {AppError} When database operation fails
+ */
+const createManyTransactions = async (transactions) => {
+  try {
+    return await prisma.transaction.createMany({
+      data: transactions,
+    });
+  } catch (error) {
+    logError(error);
+  }
+};
 
 /**
  * Lists transactions with advanced filtering, sorting, and pagination
@@ -223,9 +239,10 @@ const updateTransaction = async (id, data) => {
 export default {
   createTransaction,
   createTransactionsFromOfx,
+  createManyTransactions,
   listTransactions,
   listTransactionById,
   deleteTransaction,
   updateTransaction,
-  listByCategory
+  listByCategory,
 };

@@ -10,6 +10,14 @@ const baseTransactionSchema = z.object({
     .refine((date) => !isNaN(date.getTime())),
   account: z.string().min(1),
   amount: z.number().min(0),
+  recurrenceInterval: z
+    .string()
+    .optional()
+    .transform((val) => (val ? parseInt(val, 10) : undefined))
+    .refine((val) => val === undefined || (Number.isInteger(val) && val >= 0), {
+      message: "Intervalo inválido",
+    }),
+  recurrenceCount: z.number().int().min(0).optional().default(0),
 });
 
 export const createTransactionSchema = baseTransactionSchema;
@@ -35,9 +43,18 @@ export const createTransactionsFromOfxSchema = z.array(
 
 export const querySchema = z.object({
   type: z.enum(["INCOME", "EXPENSE"]).optional(),
-  date: z.string().refine((val) => !isNaN(Date.parse(val))).optional(),
-  date__gte: z.string().refine((val) => !isNaN(Date.parse(val))).optional(),
-  date__lte: z.string().refine((val) => !isNaN(Date.parse(val))).optional(),
+  date: z
+    .string()
+    .refine((val) => !isNaN(Date.parse(val)))
+    .optional(),
+  date__gte: z
+    .string()
+    .refine((val) => !isNaN(Date.parse(val)))
+    .optional(),
+  date__lte: z
+    .string()
+    .refine((val) => !isNaN(Date.parse(val)))
+    .optional(),
   sort: z.enum(["asc", "desc"]).optional(),
   search: z.string().optional(),
   page: z.coerce.number().int().min(1).optional(),
