@@ -35,7 +35,8 @@ api-cash-wise/
 │   └── schema.prisma        # Schema do Prisma
 ├── src/
 │   ├── config/
-│   │   └── envs.js         # Configurações de ambiente
+│   │   ├── envs.js         # Configurações de ambiente
+│   │   └── swagger.js      # Configuração do Swagger
 │   ├── controllers/        # Controladores das rotas
 │   │   ├── budget.controller.js
 │   │   ├── category.controller.js
@@ -196,185 +197,49 @@ npm start
 }
 ```
 
-## 🔗 Endpoints da API
+## 📚 Documentação da API
 
-### 🏷️ Categorias
+A documentação completa da API está disponível através do Swagger UI:
 
-#### `POST /category`
-Cria uma nova categoria.
-```json
-{
-  "name": "Alimentação",
-  "type": "EXPENSE",
-  "color": "#FF6B6B",
-  "icon": "🍔"
-}
-```
+- **Desenvolvimento**: `http://localhost:8080/docs`
+- **Produção**: `https://cashwiseapi-hav8m.kinsta.app/docs`
 
-#### `GET /category`
-Lista categorias com paginação e filtros.
-- **Query params**: `type`, `page`, `perPage`
-- **Headers de resposta**: `x-total-count`, `x-current-page`, `x-per-page`, `x-total-pages`
+A documentação inclui:
+- Todos os endpoints disponíveis
+- Esquemas de request e response
+- Exemplos de uso
+- Códigos de status HTTP
+- Autenticação necessária
 
-#### `GET /category/:id`
-Busca categoria por ID.
+### Principais Recursos da API
 
-#### `PATCH /category/:id`
-Atualiza categoria existente.
+#### 🏷️ Categorias
+- Criação, listagem, atualização e exclusão de categorias
+- Filtros por tipo (INCOME/EXPENSE)
+- Paginação e validação de dados
 
-#### `DELETE /category/:id`
-Remove categoria (apenas se não houver transações associadas).
+#### 💰 Transações
+- Gerenciamento completo de transações financeiras
+- Importação em lote via dados OFX
+- Filtros avançados por data, tipo, categoria
+- Busca por descrição e conta
+- Paginação com headers informativos
 
-### 💰 Transações
+#### 💼 Orçamentos
+- Criação e controle de orçamentos por categoria
+- Cálculo automático de gastos
+- Comparação com limites estabelecidos
 
-#### `POST /transaction`
-Cria uma nova transação.
-```json
-{
-  "type": "EXPENSE",
-  "description": "Almoço no restaurante",
-  "categoryId": "uuid-da-categoria",
-  "date": "2024-01-15T12:00:00Z",
-  "account": "Cartão de Crédito",
-  "amount": 45.50
-}
-```
+#### 🎯 Metas
+- Definição de metas financeiras
+- Acompanhamento de progresso
+- Prazos e valores alvo
 
-#### `POST /transaction/import-ofx`
-Importa transações em lote a partir de dados OFX.
-```json
-[
-  {
-    "description": "Pagamento PIX",
-    "date": "2024-01-15T10:30:00Z",
-    "amount": "150.00",
-    "type": "EXPENSE"
-  }
-]
-```
-
-#### `GET /transaction`
-Lista transações com filtros avançados.
-- **Query params**: 
-  - `type`: Tipo da transação (INCOME/EXPENSE)
-  - `date`: Data específica
-  - `date__gte`: Data maior ou igual
-  - `date__lte`: Data menor ou igual
-  - `sort`: Ordenação (asc/desc)
-  - `search`: Busca por descrição ou conta
-  - `page`: Página atual
-  - `perPage`: Itens por página
-
-#### `GET /transaction/:id`
-Busca transação por ID.
-
-#### `PATCH /transaction/:id`
-Atualiza transação existente.
-
-#### `DELETE /transaction/:id`
-Remove transação.
-
-### 💼 Orçamentos
-
-#### `POST /budget`
-Cria um novo orçamento.
-```json
-{
-  "categoryId": "uuid-da-categoria",
-  "limit": 500.00,
-  "date": "2024-01-01T00:00:00Z"
-}
-```
-
-#### `GET /budget`
-Lista todos os orçamentos do usuário com gastos calculados.
-
-#### `GET /budget/:id`
-Busca orçamento por ID.
-
-#### `PATCH /budget/:id`
-Atualiza orçamento existente.
-
-#### `DELETE /budget/:id`
-Remove orçamento.
-
-### 🎯 Metas
-
-#### `POST /goal`
-Cria uma nova meta financeira.
-```json
-{
-  "categoryId": "uuid-da-categoria",
-  "title": "Viagem para Europa",
-  "description": "Economizar para viagem de férias",
-  "targetAmount": 10000.00,
-  "currentAmount": 2500.00,
-  "deadline": "2024-12-31T23:59:59Z"
-}
-```
-
-#### `GET /goal`
-Lista todas as metas do usuário.
-
-#### `GET /goal/:id`
-Busca meta por ID.
-
-#### `PATCH /goal/:id`
-Atualiza meta existente.
-
-#### `DELETE /goal/:id`
-Remove meta.
-
-### 📊 Relatórios
-
-#### `GET /report/monthly`
-Relatório mensal de receitas e despesas.
-- **Query params**: `period__gte`, `period__lte`
-```json
-[
-  {
-    "name": "Jan/2024",
-    "income": 5000.00,
-    "expense": 3500.00
-  }
-]
-```
-
-#### `GET /report/categories`
-Relatório por categorias com limite opcional.
-- **Query params**: `period__gte`, `period__lte`, `limit`
-```json
-[
-  {
-    "name": "Alimentação",
-    "value": -1200.00,
-    "fill": "#FF6B6B"
-  }
-]
-```
-
-#### `GET /report/balance`
-Relatório de saldo mensal.
-- **Query params**: `period__gte`, `period__lte`
-```json
-[
-  {
-    "name": "Jan",
-    "balance": 1500.00
-  }
-]
-```
-
-#### `GET /report/summary`
-Resumo financeiro do período.
-- **Query params**: `period__gte`, `period__lte`
-```json
-{
-  "income": 5000.00,
-  "expense": 3500.00,
-  "balance": 1500.00
-}
-```
+#### 📊 Relatórios
+- Relatórios mensais de receitas e despesas
+- Análise por categorias
+- Relatórios de saldo e resumos financeiros
+- Filtros por período
 
 ## 🔐 Autenticação
 
@@ -449,6 +314,17 @@ docker-compose up -d
 # Parar e remover volumes
 docker-compose down -v
 ```
+
+## 🏗️ Arquitetura
+
+A API segue uma arquitetura em camadas bem definida:
+
+- **Controllers**: Gerenciam requisições HTTP e respostas
+- **Services**: Contêm a lógica de negócio
+- **Repositories**: Camada de acesso aos dados
+- **Schemas**: Validação de entrada com Zod
+- **Middleware**: Autenticação e validações
+- **Plugins**: Funcionalidades reutilizáveis do Fastify
 
 ## 📄 Licença
 
