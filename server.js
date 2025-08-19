@@ -1,20 +1,22 @@
 import fastify from "fastify";
 import cors from "@fastify/cors";
-import routes from "./src/routes/index.js";
 import { createRequire } from "node:module";
+import routes from "./src/routes/index.js";
 import environment from "./src/config/envs.js";
+import { swaggerOptions, swaggerUiOptions } from "./src/config/swagger.js";
 
 const require = createRequire(import.meta.url);
 const { clerkPlugin } = require("@clerk/fastify");
 
 const app = fastify({
-  pluginTimeout: 60000,
+  pluginTimeout: 60_000,
   bodyLimit: 10 * 1024 * 1024,
 });
 
+/* ----- CORS ----- */
 app.register(cors, {
   origin: (origin, cb) => {
-    const allowedOrigins = [
+    const allow = [
       "https://appcashwise.com.br",
       "https://www.appcashwise.com.br",
       "https://cashwiseapi-hav8m.kinsta.app",
@@ -22,12 +24,8 @@ app.register(cors, {
       "http://localhost:3000",
       "http://127.0.0.1:3000",
     ];
-
-    if (!origin || allowedOrigins.includes(origin)) {
-      cb(null, true);
-    } else {
-      cb(new Error("Not allowed by CORS"), false);
-    }
+    if (!origin || allow.includes(origin)) cb(null, true);
+    else cb(new Error("Not allowed by CORS"), false);
   },
   methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
   allowedHeaders: "*",
@@ -40,22 +38,31 @@ app.register(cors, {
   ],
 });
 
+/* ----- Swagger Documentation ----- */
+await app.register(import("@fastify/swagger"), swaggerOptions);
+await app.register(import("@fastify/swagger-ui"), swaggerUiOptions);
+
+/* ----- Auth (Clerk) ----- */
 app.register(clerkPlugin, {
   secretKey: environment.secretKey,
   publishableKey: environment.publishableKey,
 });
 
-app.register(routes);
+/* ----- Custom plugins ----- */
+await app.register(import("./src/plugins/userId.js"));
+await app.register(import("./src/plugins/zodValidate.js"));
 
+/* ----- Rotas ----- */
+await app.register(routes);
+
+/* ----- Start ----- */
 app
-  .listen({
-    port: environment.port || 8080,
-    host: "0.0.0.0",
-  })
+  .listen({ port: environment.port ?? 8080, host: "0.0.0.0" })
   .then(() => {
-    console.log(`Server is running on port ${environment.port || 8080}`);
+    console.log(`🚀  Server rodando na porta ${environment.port ?? 8080}`);
+    console.log(`📚  Documentação disponível em: http://localhost:${environment.port ?? 8080}/docs`);
   })
   .catch((err) => {
-    console.error("Error starting server:", err);
+    console.error("Erro ao iniciar o servidor:", err);
     process.exit(1);
   });

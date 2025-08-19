@@ -1,29 +1,19 @@
-import { z } from "zod";
 import { StatusCodes } from "http-status-codes";
 import reportService from "../services/report.service.js";
 import { handleErrorResponse } from "../utils/error.js";
-import { getUserIdFromRequest } from "../utils/getUserId.js";
 
-const listMonthlyReports = async (request, reply) => {
-  const querySchema = z.object({
-    period__gte: z.string().refine((val) => !isNaN(Date.parse(val)), {
-      message: "Data inválida",
-    }),
-    period__lte: z.string().refine((val) => !isNaN(Date.parse(val)), {
-      message: "Data inválida",
-    }),
-  });
-
+/**
+ * Generates monthly financial reports with income and expense data
+ * @param {import('fastify').FastifyRequest} req - The request object containing period filters
+ * @param {import('fastify').FastifyReply} reply - The reply object to send response
+ * @returns {Promise<void>} Promise that resolves with monthly report data
+ */
+const listMonthlyReports = async (req, reply) => {
   try {
-    const validation = querySchema.safeParse(request.query);
-    if (!validation.success) throw validation.error;
-
-    const { period__gte, period__lte } = validation.data;
-    const userId = await getUserIdFromRequest(request);
     const reports = await reportService.listMonthlyReports(
-      userId,
-      period__gte,
-      period__lte
+      req.userId,
+      req.query.period__gte,
+      req.query.period__lte
     );
     reply.code(StatusCodes.OK).send(reports);
   } catch (error) {
@@ -31,53 +21,38 @@ const listMonthlyReports = async (request, reply) => {
   }
 };
 
-const listCategoriesWithTransactions = async (request, reply) => {
-  const querySchema = z.object({
-    period__gte: z.string().refine((val) => !isNaN(Date.parse(val)), {
-      message: "Data inválida",
-    }),
-    period__lte: z.string().refine((val) => !isNaN(Date.parse(val)), {
-      message: "Data inválida",
-    }),
-  });
-
+/**
+ * Generates category-based financial reports with transaction totals
+ * @param {import('fastify').FastifyRequest} req - The request object containing period filters and limit
+ * @param {import('fastify').FastifyReply} reply - The reply object to send response
+ * @returns {Promise<void>} Promise that resolves with category report data
+ */
+const listCategoriesWithTransactions = async (req, reply) => {
   try {
-    const validation = querySchema.safeParse(request.query);
-    if (!validation.success) throw validation.error;
-
-    const { period__gte, period__lte } = validation.data;
-    const userId = await getUserIdFromRequest(request);
-    const categories = await reportService.listCategoriesReports(
-      userId,
-      period__gte,
-      period__lte
+    const reports = await reportService.listCategoriesReports(
+      req.userId,
+      req.query.period__gte,
+      req.query.period__lte,
+      req.query.limit
     );
-    reply.code(StatusCodes.OK).send(categories);
+    reply.code(StatusCodes.OK).send(reports);
   } catch (error) {
     handleErrorResponse(error, reply);
   }
 };
 
-const listBalanceReports = async (request, reply) => {
-  const querySchema = z.object({
-    period__gte: z.string().refine((val) => !isNaN(Date.parse(val)), {
-      message: "Data inválida",
-    }),
-    period__lte: z.string().refine((val) => !isNaN(Date.parse(val)), {
-      message: "Data inválida",
-    }),
-  });
-
+/**
+ * Generates balance reports showing monthly financial balance (income - expenses)
+ * @param {import('fastify').FastifyRequest} req - The request object containing period filters
+ * @param {import('fastify').FastifyReply} reply - The reply object to send response
+ * @returns {Promise<void>} Promise that resolves with balance report data
+ */
+const listBalanceReports = async (req, reply) => {
   try {
-    const validation = querySchema.safeParse(request.query);
-    if (!validation.success) throw validation.error;
-
-    const { period__gte, period__lte } = validation.data;
-    const userId = await getUserIdFromRequest(request);
     const reports = await reportService.listBalanceReports(
-      userId,
-      period__gte,
-      period__lte
+      req.userId,
+      req.query.period__gte,
+      req.query.period__lte
     );
     reply.code(StatusCodes.OK).send(reports);
   } catch (error) {
@@ -85,26 +60,18 @@ const listBalanceReports = async (request, reply) => {
   }
 };
 
-const listSummaryReports = async (request, reply) => {
-  const querySchema = z.object({
-    period__gte: z.string().refine((val) => !isNaN(Date.parse(val)), {
-      message: "Data inválida",
-    }),
-    period__lte: z.string().refine((val) => !isNaN(Date.parse(val)), {
-      message: "Data inválida",
-    }),
-  });
-
+/**
+ * Generates summary financial reports with consolidated totals
+ * @param {import('fastify').FastifyRequest} req - The request object containing period filters
+ * @param {import('fastify').FastifyReply} reply - The reply object to send response
+ * @returns {Promise<void>} Promise that resolves with summary report data
+ */
+const listSummaryReports = async (req, reply) => {
   try {
-    const validation = querySchema.safeParse(request.query);
-    if (!validation.success) throw validation.error;
-
-    const { period__gte, period__lte } = validation.data;
-    const userId = await getUserIdFromRequest(request);
     const reports = await reportService.listSummaryReports(
-      userId,
-      period__gte,
-      period__lte
+      req.userId,
+      new Date(req.query.period__gte),
+      new Date(req.query.period__lte)
     );
     reply.code(StatusCodes.OK).send(reports);
   } catch (error) {

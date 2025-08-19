@@ -3,6 +3,15 @@ import transactionRepository from "../repositories/transaction.repository.js";
 import categoryRepository from "../repositories/category.repository.js";
 import AppError from "../utils/error.js";
 
+/**
+ * Creates a new budget for a specific category and calculates spent amount
+ * @param {string} userId - The ID of the user creating the budget
+ * @param {string} categoryId - The ID of the category for the budget
+ * @param {number} limit - The budget limit amount
+ * @param {Date} date - The date for the budget period
+ * @returns {Promise<Object>} Promise that resolves with the created budget data including spent amount
+ * @throws {AppError} When budget creation fails
+ */
 const createBudget = async (userId, categoryId, limit, date) => {
   try {
     await budgetRepository.createBudget(userId, categoryId, limit, date);
@@ -25,6 +34,12 @@ const createBudget = async (userId, categoryId, limit, date) => {
   }
 };
 
+/**
+ * Lists all budgets for a specific user with calculated spent amounts
+ * @param {string} userId - The ID of the user whose budgets to retrieve
+ * @returns {Promise<Array>} Promise that resolves with array of budget objects including spent calculations
+ * @throws {AppError} When budget retrieval fails
+ */
 const listBudgets = async (userId) => {
   try {
     const budgets = await budgetRepository.listBudgetsByUser(userId);
@@ -62,6 +77,12 @@ const listBudgets = async (userId) => {
   }
 };
 
+/**
+ * Retrieves a specific budget by ID with calculated spent amount
+ * @param {string} id - The ID of the budget to retrieve
+ * @returns {Promise<Object>} Promise that resolves with budget data including spent calculation
+ * @throws {AppError} When budget retrieval fails
+ */
 const listBudgetById = async (id) => {
   try {
     const budget = await budgetRepository.listBudgetById(id);
@@ -93,6 +114,12 @@ const listBudgetById = async (id) => {
   }
 };
 
+/**
+ * Deletes a budget by its ID
+ * @param {string} id - The ID of the budget to delete
+ * @returns {Promise<Object>} Promise that resolves with deletion confirmation
+ * @throws {AppError} When budget deletion fails
+ */
 const deleteBudget = async (id) => {
   try {
     const deleted = await budgetRepository.deleteBudget(id);
@@ -102,6 +129,17 @@ const deleteBudget = async (id) => {
   }
 };
 
+/**
+ * Updates an existing budget with new data and recalculates spent amount
+ * @param {string} id - The ID of the budget to update
+ * @param {string} categoryId - The new category ID (optional)
+ * @param {string} icon - The new icon (optional)
+ * @param {string} color - The new color (optional)
+ * @param {number} limit - The new limit amount (optional)
+ * @param {Date} date - The new date (optional)
+ * @returns {Promise<Object>} Promise that resolves with updated budget data including spent calculation
+ * @throws {AppError} When budget update fails
+ */
 const updateBudget = async (id, categoryId, icon, color, limit, date) => {
   try {
     const budget = await budgetRepository.updateBudget(id, {

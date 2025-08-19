@@ -1,79 +1,51 @@
-import { z } from "zod";
 import { StatusCodes } from "http-status-codes";
-import transactionService from "../services/transaction.service.js";
 import AppError, { handleErrorResponse } from "../utils/error.js";
-import { getUserIdFromRequest } from "../utils/getUserId.js";
+import transactionService from "../services/transaction.service.js";
 
-const createTransaction = async (request, reply) => {
-  const userId = await getUserIdFromRequest(request);
-
-  const transactionSchema = z.object({
-    type: z.enum(["INCOME", "EXPENSE"]),
-    description: z.string().min(1),
-    categoryId: z.string().min(1),
-    date: z
-      .string()
-      .transform((str) => new Date(str))
-      .refine((date) => !isNaN(date.getTime())),
-    account: z.string().min(1),
-    amount: z.number().min(0),
-  });
-
+/**
+ * Creates a new financial transaction for the authenticated user
+ * @param {import('fastify').FastifyRequest} req - The request object containing transaction data
+ * @param {import('fastify').FastifyReply} reply - The reply object to send response
+ * @returns {Promise<void>} Promise that resolves when transaction is created
+ */
+const createTransaction = async (req, reply) => {
   try {
-    const validation = transactionSchema.safeParse(request.body);
-    if (!validation.success) throw validation.error;
-
     const transaction = await transactionService.createTransaction(
-      userId,
-      ...Object.values(validation.data)
+      req.userId,
+      ...Object.values(req.body)
     );
-
     reply.code(StatusCodes.CREATED).send(transaction);
-  } catch (error) {
-    handleErrorResponse(error, reply);
+  } catch (err) {
+    handleErrorResponse(err, reply);
   }
 };
 
-const listTransactions = async (request, reply) => {
-  const userId = await getUserIdFromRequest(request);
-
-  const querySchema = z.object({
-    type: z.enum(["INCOME", "EXPENSE"]).optional(),
-    date: z
-      .string()
-      .refine((val) => !isNaN(Date.parse(val)))
-      .optional(),
-    date__gte: z
-      .string()
-      .refine((val) => !isNaN(Date.parse(val)))
-      .optional(),
-    date__lte: z
-      .string()
-      .refine((val) => !isNaN(Date.parse(val)))
-      .optional(),
-    sort: z.enum(["asc", "desc"]).optional(),
-    search: z.string().optional(),
-    page: z
-      .string()
-      .transform(Number)
-      .refine((val) => val > 0, {
-        message: "Page precisa ser maior que 0",
-      })
-      .optional(),
-
-    perPage: z
-      .string()
-      .transform(Number)
-      .refine((val) => val > 0, {
-        message: "perPage precisa ser maior que 0",
-      })
-      .optional(),
-  });
-
+/**
+ * Creates multiple transactions from OFX data import
+ * @param {import('fastify').FastifyRequest} req - The request object containing array of OFX transactions
+ * @param {import('fastify').FastifyReply} reply - The reply object to send response
+ * @returns {Promise<void>} Promise that resolves when transactions are imported
+ */
+const createTransactionsFromOfx = async (req, reply) => {
   try {
-    const validation = querySchema.safeParse(request.query);
-    if (!validation.success) throw validation.error;
+    const transactions = await transactionService.createTransactionsFromOfx(
+      req.userId,
+      req.body
+    );
+    reply.code(StatusCodes.CREATED).send(transactions);
+  } catch (err) {
+    handleErrorResponse(err, reply);
+  }
+};
 
+/**
+ * Lists transactions for the authenticated user with advanced filtering and pagination
+ * @param {import('fastify').FastifyRequest} req - The request object containing query filters
+ * @param {import('fastify').FastifyReply} reply - The reply object to send response
+ * @returns {Promise<void>} Promise that resolves with paginated list of transactions
+ */
+const listTransactions = async (req, reply) => {
+  try {
     const {
       type,
       date,
@@ -83,10 +55,10 @@ const listTransactions = async (request, reply) => {
       search,
       page = 1,
       perPage = 10,
-    } = validation.data;
+    } = req.query;
 
     const { transactions, total } = await transactionService.listTransactions(
-      userId,
+      req.userId,
       type,
       date,
       date__gte,
@@ -106,91 +78,62 @@ const listTransactions = async (request, reply) => {
       .header("x-total-pages", totalPages)
       .code(StatusCodes.OK)
       .send(transactions);
-  } catch (error) {
-    handleErrorResponse(error, reply);
+  } catch (err) {
+    handleErrorResponse(err, reply);
   }
 };
 
-const listTransactionById = async (request, reply) => {
-  const schema = z.object({ id: z.string() });
-
+/**
+ * Retrieves a specific transaction by its ID
+ * @param {import('fastify').FastifyRequest} req - The request object containing transaction ID in params
+ * @param {import('fastify').FastifyReply} reply - The reply object to send response
+ * @returns {Promise<void>} Promise that resolves with transaction data
+ */
+const listTransactionById = async (req, reply) => {
   try {
-    const validation = schema.safeParse(request.params);
-    if (!validation.success) throw validation.error;
-
-    const { id } = validation.data;
-    const transaction = await transactionService.listTransactionById(id);
-
+    const transaction = await transactionService.listTransactionById(req.params.id);
     if (!transaction) throw new AppError("Transação não encontrada", 404);
-
     reply.code(StatusCodes.OK).send(transaction);
-  } catch (error) {
-    handleErrorResponse(error, reply);
+  } catch (err) {
+    handleErrorResponse(err, reply);
   }
 };
 
-const deleteTransaction = async (request, reply) => {
-  const schema = z.object({ id: z.string() });
-
+/**
+ * Deletes a transaction by its ID
+ * @param {import('fastify').FastifyRequest} req - The request object containing transaction ID in params
+ * @param {import('fastify').FastifyReply} reply - The reply object to send response
+ * @returns {Promise<void>} Promise that resolves when transaction is deleted
+ */
+const deleteTransaction = async (req, reply) => {
   try {
-    const validation = schema.safeParse(request.params);
-    if (!validation.success) throw validation.error;
-
-    const { id } = validation.data;
-
-    const transaction = await transactionService.deleteTransaction(id);
-    if (!transaction) throw new AppError("Transação não encontrada", 404);
-
-    reply
-      .code(StatusCodes.OK)
-      .send({ message: "Transação deletada com sucesso" });
-  } catch (error) {
-    handleErrorResponse(error, reply);
+    const deleted = await transactionService.deleteTransaction(req.params.id);
+    if (!deleted) throw new AppError("Transação não encontrada", 404);
+    reply.code(StatusCodes.OK).send({ message: "Transação deletada com sucesso" });
+  } catch (err) {
+    handleErrorResponse(err, reply);
   }
 };
 
-const updateTransaction = async (request, reply) => {
-  const paramsSchema = z.object({ id: z.string() });
-  const bodySchema = z.object({
-    type: z.enum(["INCOME", "EXPENSE"]).optional(),
-    description: z.string().min(1).optional(),
-    categoryId: z.string().min(1).optional(),
-    date: z
-      .string()
-      .transform((str) => new Date(str))
-      .refine((date) => !isNaN(date.getTime()))
-      .optional(),
-    account: z.string().min(1).optional(),
-    amount: z.number().min(0).optional(),
-  });
-
+/**
+ * Updates an existing transaction with new data
+ * @param {import('fastify').FastifyRequest} req - The request object containing transaction ID and update data
+ * @param {import('fastify').FastifyReply} reply - The reply object to send response
+ * @returns {Promise<void>} Promise that resolves with updated transaction data
+ */
+const updateTransaction = async (req, reply) => {
   try {
-    const paramsValidation = paramsSchema.safeParse(request.params);
-    const bodyValidation = bodySchema.safeParse(request.body);
-
-    if (!paramsValidation.success || !bodyValidation.success) {
-      throw new z.ZodError([
-        ...paramsValidation.error.errors,
-        ...bodyValidation.error.errors,
-      ]);
-    }
-
-    const { id } = paramsValidation.data;
-    const transaction = await transactionService.updateTransaction(
-      id,
-      bodyValidation.data
-    );
-
-    if (!transaction) throw new AppError("Transação não encontrada", 404);
-
-    reply.code(StatusCodes.OK).send(transaction);
-  } catch (error) {
-    handleErrorResponse(error, reply);
+    const updated = await transactionService.updateTransaction(req.params.id, req.body);
+    if (!updated) throw new AppError("Transação não encontrada", 404);
+    reply.code(StatusCodes.OK).send(updated);
+  } catch (err) {
+    handleErrorResponse(err, reply);
   }
 };
 
 export default {
   createTransaction,
+  createTransactionsFromOfx,
   listTransactions,
   listTransactionById,
   deleteTransaction,

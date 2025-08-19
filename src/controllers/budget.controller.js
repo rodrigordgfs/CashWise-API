@@ -1,88 +1,73 @@
-import { z } from "zod";
 import { StatusCodes } from "http-status-codes";
-import budgetService from "../services/budget.service.js";
 import AppError, { handleErrorResponse } from "../utils/error.js";
-import { getUserIdFromRequest } from "../utils/getUserId.js";
+import budgetService from "../services/budget.service.js";
 
-const createBudget = async (request, reply) => {
-  const userId = await getUserIdFromRequest(request);
-
-  const budgetSchema = z.object({
-    categoryId: z.string().min(1, "O ID da categoria é obrigatório"),
-    limit: z.number(),
-    date: z.string().refine((val) => !isNaN(Date.parse(val)), {
-      message: "Data inválida",
-    }),
-  });
-
+/**
+ * Creates a new budget for a specific category
+ * @param {import('fastify').FastifyRequest} req - The request object containing budget data
+ * @param {import('fastify').FastifyReply} reply - The reply object to send response
+ * @returns {Promise<void>} Promise that resolves when budget is created
+ */
+const createBudget = async (req, reply) => {
   try {
-    const validation = budgetSchema.safeParse(request.body);
-    if (!validation.success) throw validation.error;
-
-    const { categoryId, limit, date } = validation.data;
-
+    const { categoryId, limit, date } = req.body;
     const budget = await budgetService.createBudget(
-      userId,
+      req.userId,
       categoryId,
       limit,
       new Date(date)
     );
-
     reply.code(StatusCodes.CREATED).send(budget);
   } catch (error) {
     handleErrorResponse(error, reply);
   }
 };
 
-const listBudget = async (request, reply) => {
-  const userId = await getUserIdFromRequest(request);
-
+/**
+ * Lists all budgets for the authenticated user
+ * @param {import('fastify').FastifyRequest} req - The request object
+ * @param {import('fastify').FastifyReply} reply - The reply object to send response
+ * @returns {Promise<void>} Promise that resolves with list of budgets
+ */
+const listBudget = async (req, reply) => {
   try {
-    const budgets = await budgetService.listBudgets(userId);
+    const budgets = await budgetService.listBudgets(req.userId);
     reply.code(StatusCodes.OK).send(budgets);
   } catch (error) {
     handleErrorResponse(error, reply);
   }
 };
 
-const listBudgetById = async (request, reply) => {
-  const paramsSchema = z.object({
-    id: z.string().min(1, "O ID do orçamento é obrigatório"),
-  });
-
+/**
+ * Retrieves a specific budget by its ID
+ * @param {import('fastify').FastifyRequest} req - The request object containing budget ID in params
+ * @param {import('fastify').FastifyReply} reply - The reply object to send response
+ * @returns {Promise<void>} Promise that resolves with budget data
+ */
+const listBudgetById = async (req, reply) => {
   try {
-    const validation = paramsSchema.safeParse(request.params);
-    if (!validation.success) throw validation.error;
-
-    const { id } = validation.data;
-    const budget = await budgetService.listBudgetById(id);
-
+    const budget = await budgetService.listBudgetById(req.params.id);
     if (!budget) {
       throw new AppError("Orçamento não encontrado", StatusCodes.NOT_FOUND);
     }
-
     reply.code(StatusCodes.OK).send(budget);
   } catch (error) {
     handleErrorResponse(error, reply);
   }
 };
 
-const deleteBudget = async (request, reply) => {
-  const paramsSchema = z.object({
-    id: z.string().min(1, "O ID do orçamento é obrigatório"),
-  });
-
+/**
+ * Deletes a budget by its ID
+ * @param {import('fastify').FastifyRequest} req - The request object containing budget ID in params
+ * @param {import('fastify').FastifyReply} reply - The reply object to send response
+ * @returns {Promise<void>} Promise that resolves when budget is deleted
+ */
+const deleteBudget = async (req, reply) => {
   try {
-    const validation = paramsSchema.safeParse(request.params);
-    if (!validation.success) throw validation.error;
-
-    const { id } = validation.data;
-    const deleted = await budgetService.deleteBudget(id);
-
+    const deleted = await budgetService.deleteBudget(req.params.id);
     if (!deleted) {
       throw new AppError("Orçamento não encontrado", StatusCodes.NOT_FOUND);
     }
-
     reply
       .code(StatusCodes.OK)
       .send({ message: "Orçamento deletado com sucesso" });
@@ -91,42 +76,17 @@ const deleteBudget = async (request, reply) => {
   }
 };
 
-const updateBudget = async (request, reply) => {
-  const paramsSchema = z.object({
-    id: z.string().min(1, "O ID do orçamento é obrigatório"),
-  });
-
-  const bodySchema = z.object({
-    categoryId: z.string().optional(),
-    icon: z.string().optional(),
-    color: z.string().optional(),
-    limit: z.number().optional(),
-    date: z
-      .string()
-      .optional()
-      .refine((val) => !val || !isNaN(Date.parse(val)), {
-        message: "Data inválida",
-      }),
-  });
-
+/**
+ * Updates an existing budget with new data
+ * @param {import('fastify').FastifyRequest} req - The request object containing budget ID and update data
+ * @param {import('fastify').FastifyReply} reply - The reply object to send response
+ * @returns {Promise<void>} Promise that resolves with updated budget data
+ */
+const updateBudget = async (req, reply) => {
   try {
-    // Validação dos parâmetros
-    const paramsValidation = paramsSchema.safeParse(request.params);
-    if (!paramsValidation.success) {
-      throw paramsValidation.error;
-    }
-
-    // Validação do corpo da requisição
-    const bodyValidation = bodySchema.safeParse(request.body);
-    if (!bodyValidation.success) {
-      throw bodyValidation.error;
-    }
-
-    const { id } = paramsValidation.data;
-    const { categoryId, icon, color, limit, date } = bodyValidation.data;
-
+    const { categoryId, icon, color, limit, date } = req.body;
     const updated = await budgetService.updateBudget(
-      id,
+      req.params.id,
       categoryId,
       icon,
       color,

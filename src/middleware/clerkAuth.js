@@ -2,6 +2,13 @@ import { createRequire } from 'node:module';
 const require = createRequire(import.meta.url);
 const { getAuth } = require('@clerk/fastify');
 
+/**
+ * Middleware function for Clerk authentication validation
+ * Verifies that the request contains a valid authenticated user
+ * @param {import('fastify').FastifyRequest} request - The Fastify request object
+ * @param {import('fastify').FastifyReply} reply - The Fastify reply object
+ * @returns {Promise<void>} Promise that resolves if authentication is successful
+ */
 const clerkAuth = async (request, reply) => {
   try {
     const { userId } = await getAuth(request);
